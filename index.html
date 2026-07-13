@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Life HQ</title>
+<!-- ─── CONFIG: Replace these two values after setup ─────────────────────── -->
+<script>
+  const CLIENT_ID = '48534488595-9df83hvfg0mqa91k3qll8bin7jml9pi0.apps.googleusercontent.com';
+  const SHEET_ID  = '1rZBAhQ1ZD1WBPuQqiHxodNvxSvcWIxC_N3P7ytnu_g0';
+</script>
+<!-- ──────────────────────────────────────────────────────────────────────── -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root {
+  color-scheme: light;
+  --bg:#f8f9fa; --surface:#fff; --border:#e2e8f0;
+  --text:#1a202c; --muted:#718096;
+  --accent:#4f46e5; --accent-light:#eef2ff;
+  --green:#10b981; --red:#ef4444; --orange:#f97316;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Sign-in screen ── */
+#signin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:24px;padding:40px 20px;text-align:center}
+#signin-screen .logo{font-size:56px}
+#signin-screen h1{font-size:28px;font-weight:700;color:var(--accent)}
+#signin-screen p{font-size:15px;color:var(--muted);max-width:300px;line-height:1.5}
+.signin-btn{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.1);transition:box-shadow .15s}
+.signin-btn:hover{box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.signin-btn svg{width:20px;height:20px}
+
+/* ── Main app ── */
+#app{display:none;flex-direction:column;flex:1;overflow:hidden}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.header h1{font-size:17px;font-weight:700;color:var(--accent)}
+.sync-indicator{font-size:11px;color:var(--muted);margin-left:4px}
+.sync-indicator.saving{color:var(--orange)}
+.sync-indicator.saved{color:var(--green)}
+.sync-indicator.error{color:var(--red)}
+.header-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+.btn{padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:white}
+.btn-primary:hover{background:#4338ca}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg)}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* ── Layout ── */
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:200px;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px;overflow-y:auto;flex-shrink:0}
+@media(max-width:640px){
+  .sidebar{display:none}
+  .sidebar.open{display:flex;flex-direction:column;position:fixed;inset:0;z-index:50;width:240px;box-shadow:4px 0 20px rgba(0,0,0,.2);padding-top:60px}
+}
+.sidebar-section{margin-bottom:18px}
+.sidebar-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:0 8px;margin-bottom:5px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text);transition:all .1s;user-select:none}
+.nav-item:hover{background:var(--bg)}
+.nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:500}
+.nav-count{margin-left:auto;font-size:11px;background:var(--border);border-radius:10px;padding:1px 6px;color:var(--muted)}
+.nav-item.active .nav-count{background:var(--accent);color:white}
+
+/* ── Content ── */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.filter-label{font-size:11px;color:var(--muted);font-weight:500}
+.filter-btn{padding:4px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;font-size:12px;cursor:pointer;transition:all .1s;color:var(--text)}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.filter-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+.filter-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
+.search-wrap{margin-left:auto}
+.search-input{padding:5px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;width:160px;background:var(--bg)}
+@media(max-width:640px){.search-input{width:110px}}
+.search-input:focus{border-color:var(--accent);background:white}
+
+/* ── Stats ── */
+.stats-bar{display:flex;gap:8px;padding:8px 14px;flex-shrink:0;background:var(--bg);overflow-x:auto;scrollbar-width:none}
+.stats-bar::-webkit-scrollbar{display:none}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 12px;flex-shrink:0}
+.stat-num{font-size:18px;font-weight:700}
+.stat-label{color:var(--muted);font-size:10px}
+
+/* ── Task list ── */
+.task-list{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:7px}
+.task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;display:flex;gap:10px;align-items:flex-start;transition:box-shadow .15s}
+.task-card:hover{box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.task-card.done{opacity:.4}
+.task-card.done .task-title{text-decoration:line-through}
+.task-check{width:18px;height:18px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .15s}
+.task-check:hover{border-color:var(--green);background:#f0fdf4}
+.task-check.checked{background:var(--green);border-color:var(--green)}
+.task-check.checked::after{content:'✓';color:white;font-size:10px;font-weight:bold}
+.task-body{flex:1;min-width:0}
+.task-title{font-size:14px;font-weight:500;margin-bottom:4px;line-height:1.4}
+.task-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.tag{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500;white-space:nowrap}
+.tag-area{background:#f1f5f9;color:#475569}
+.tag-urgency-high{background:#fee2e2;color:#b91c1c}
+.tag-urgency-med{background:#fef3c7;color:#92400e}
+.tag-urgency-low{background:#dcfce7;color:#166534}
+.tag-effort-quick{background:#e0f2fe;color:#0369a1}
+.tag-effort-halfday{background:#ede9fe;color:#6d28d9}
+.tag-effort-project{background:#fce7f3;color:#9d174d}
+.tag-cost{background:#f0fdf4;color:#15803d}
+.tag-deadline{background:#fff7ed;color:#c2410c}
+.tag-deadline.overdue{background:#fee2e2;color:#b91c1c;font-weight:700}
+.task-notes{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+.task-blocked{font-size:11px;color:var(--orange);margin-top:3px}
+.task-actions{display:flex;gap:3px;opacity:0;transition:opacity .15s;flex-shrink:0}
+@media(max-width:640px){.task-actions{opacity:1}}
+.task-card:hover .task-actions{opacity:1}
+.icon-btn{width:28px;height:28px;border:none;background:transparent;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.icon-btn:hover{background:var(--bg)}
+.icon-btn.delete:hover{background:#fee2e2;color:var(--red)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .emoji{font-size:40px;margin-bottom:12px}
+
+/* ── Weekly view ── */
+.weekly-view{flex:1;overflow-y:auto;padding:16px;display:none;flex-direction:column;gap:12px}
+.weekly-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.weekly-section-header{padding:11px 14px;font-weight:600;font-size:13px;border-bottom:1px solid var(--border)}
+.weekly-section-body{padding:2px 14px 6px}
+.weekly-task-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+.weekly-task-row:last-child{border-bottom:none}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:100;padding:0}
+@media(min-width:641px){.modal-overlay{align-items:center;padding:20px}}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-height:92dvh;overflow-y:auto}
+@media(min-width:641px){.modal{border-radius:14px;max-width:520px;max-height:88vh}}
+.modal-header{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-title{font-size:16px;font-weight:600}
+.modal-body{padding:18px 20px;display:flex;flex-direction:column;gap:13px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.form-input,.form-select,.form-textarea{padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--bg);color:var(--text)}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);background:white}
+.form-textarea{resize:vertical;min-height:70px}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.modal-footer{padding:14px 20px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface)}
+@media(max-width:640px){.modal-footer{padding-bottom:calc(20px + env(safe-area-inset-bottom))}}
+
+/* ── Settings modal ── */
+.settings-area-row{display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.settings-area-row:last-child{border-bottom:none}
+.settings-area-input{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;outline:none}
+.settings-area-input:focus{border-color:var(--accent)}
+
+/* ── View toggle ── */
+.view-toggle{display:flex;gap:3px;padding:3px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.view-btn{padding:4px 9px;border-radius:6px;border:none;background:transparent;font-size:12px;cursor:pointer;color:var(--muted)}
+.view-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+
+/* ── Mobile bottom nav ── */
+.mobile-nav{display:none;background:var(--surface);border-top:1px solid var(--border);padding:8px 16px;padding-bottom:calc(8px + env(safe-area-inset-bottom));justify-content:space-around;flex-shrink:0}
+@media(max-width:640px){.mobile-nav{display:flex}}
+.mobile-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px;border:none;background:transparent}
+.mobile-nav-btn.active{color:var(--accent)}
+.mobile-nav-btn .icon{font-size:20px}
+
+/* ── Overlay for mobile sidebar ── */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:49}
+.sidebar-overlay.open{display:block}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ── Sign-in screen ── -->
+<div id="signin-screen">
+  <div class="logo">🗂️</div>
+  <h1>Life HQ</h1>
+  <p>Your personal task manager. Sign in with Google to access your tasks from any device.</p>
+  <button class="signin-btn" onclick="signIn()">
+    <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    Sign in with Google
+  </button>
+</div>
+
+<!-- ── Main app ── -->
+<div id="app">
+  <div class="header">
+    <button class="btn btn-ghost btn-sm" id="menu-btn" onclick="toggleSidebar()" style="display:none;padding:6px 8px">☰</button>
+    <div style="font-size:20px">🗂️</div>
+    <h1>Life HQ</h1>
+    <span class="sync-indicator" id="sync-indicator"></span>
+    <div class="view-toggle" style="margin-left:8px">
+      <button class="view-btn active" onclick="switchView('list')">Tasks</button>
+      <button class="view-btn" onclick="switchView('weekly')">Weekly</button>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openSettings()">⚙️</button>
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add</button>
+      <button class="btn btn-ghost btn-sm" onclick="signOut()" title="Sign out">↪</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Views</div>
+        <div class="nav-item active" onclick="filterArea('all');closeSidebar()" id="nav-all"><span>📋</span>All Tasks<span class="nav-count" id="count-all">0</span></div>
+        <div class="nav-item" onclick="filterArea('overdue');closeSidebar()" id="nav-overdue"><span>⚠️</span>Overdue<span class="nav-count" id="count-overdue">0</span></div>
+        <div class="nav-item" onclick="filterArea('due-soon');closeSidebar()" id="nav-due-soon"><span>🔥</span>Due Soon<span class="nav-count" id="count-due-soon">0</span></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Areas</div>
+        <div class="nav-item" onclick="filterArea('house');closeSidebar()" id="nav-house"><span>🏠</span><span id="area-label-house">House</span><span class="nav-count" id="count-house">0</span></div>
+        <div class="nav-item" onclick="filterArea('job');closeSidebar()" id="nav-job"><span>✈️</span><span id="area-label-job">Priceline</span><span class="nav-count" id="count-job">0</span></div>
+        <div class="nav-item" onclick="filterArea('personal');closeSidebar()" id="nav-personal"><span>👤</span><span id="area-label-personal">Personal</span><span class="nav-count" id="count-personal">0</span></div>
+        <div class="nav-item" onclick="filterArea('sidehustle1');closeSidebar()" id="nav-sidehustle1"><span>🎮</span><span id="area-label-sidehustle1">Fun Projects</span><span class="nav-count" id="count-sidehustle1">0</span></div>
+        <div class="nav-item" onclick="filterArea('sidehustle2');closeSidebar()" id="nav-sidehustle2"><span>📺</span><span id="area-label-sidehustle2">Watch List</span><span class="nav-count" id="count-sidehustle2">0</span></div>
+        <div class="nav-item" onclick="filterArea('biz1');closeSidebar()" id="nav-biz1"><span>🏢</span><span id="area-label-biz1">GLK</span><span class="nav-count" id="count-biz1">0</span></div>
+        <div class="nav-item" onclick="filterArea('biz2');closeSidebar()" id="nav-biz2"><span>🃏</span><span id="area-label-biz2">Play Years</span><span class="nav-count" id="count-biz2">0</span></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Status</div>
+        <div class="nav-item" onclick="filterStatus('active');closeSidebar()" id="nav-active"><span>⚡</span>Active</div>
+        <div class="nav-item" onclick="filterStatus('done');closeSidebar()" id="nav-done"><span>✅</span>Completed</div>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <div class="content">
+      <div class="filter-bar">
+        <span class="filter-label">Urgency:</span>
+        <button class="filter-btn active" onclick="toggleFilter('urgency','all')" id="f-urgency-all">All</button>
+        <button class="filter-btn" onclick="toggleFilter('urgency','high')" id="f-urgency-high">🔴 High</button>
+        <button class="filter-btn" onclick="toggleFilter('urgency','med')" id="f-urgency-med">🟡 Med</button>
+        <button class="filter-btn" onclick="toggleFilter('urgency','low')" id="f-urgency-low">🟢 Low</button>
+        <div class="filter-sep"></div>
+        <span class="filter-label">Effort:</span>
+        <button class="filter-btn active" onclick="toggleFilter('effort','all')" id="f-effort-all">All</button>
+        <button class="filter-btn" onclick="toggleFilter('effort','quick')" id="f-effort-quick">⚡ Quick</button>
+        <button class="filter-btn" onclick="toggleFilter('effort','halfday')" id="f-effort-halfday">🕐 Half</button>
+        <button class="filter-btn" onclick="toggleFilter('effort','project')" id="f-effort-project">📦 Project</button>
+        <div class="search-wrap">
+          <input type="text" class="search-input" placeholder="🔍 Search..." oninput="searchTasks(this.value)" />
+        </div>
+      </div>
+
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-card"><div class="stat-num" id="stat-total" style="color:var(--accent)">0</div><div class="stat-label">Active</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-urgent" style="color:var(--red)">0</div><div class="stat-label">🔴 High</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-duesoon" style="color:var(--orange)">0</div><div class="stat-label">Due Soon</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-overdue" style="color:var(--red)">0</div><div class="stat-label">Overdue</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-done" style="color:var(--green)">0</div><div class="stat-label">Done</div></div>
+      </div>
+
+      <div class="task-list" id="task-list"></div>
+      <div class="weekly-view" id="weekly-view"></div>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="mobile-nav">
+    <button class="mobile-nav-btn" onclick="toggleSidebar()"><span class="icon">☰</span>Areas</button>
+    <button class="mobile-nav-btn active" onclick="switchView('list')"><span class="icon">📋</span>Tasks</button>
+    <button class="mobile-nav-btn" onclick="switchView('weekly')"><span class="icon">📊</span>Weekly</button>
+    <button class="mobile-nav-btn" onclick="openAddModal()"><span class="icon">➕</span>Add</button>
+  </div>
+</div>
+
+<!-- Task Modal -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Add Task</div>
+      <button class="icon-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id"/>
+      <div class="form-group">
+        <label class="form-label">TASK TITLE *</label>
+        <input type="text" class="form-input" id="f-title" placeholder="What needs to be done?"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">AREA *</label>
+          <select class="form-select" id="f-area"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">URGENCY</label>
+          <select class="form-select" id="f-urgency">
+            <option value="high">🔴 High — ASAP</option>
+            <option value="med" selected>🟡 Medium</option>
+            <option value="low">🟢 Low — Someday</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">EFFORT</label>
+          <select class="form-select" id="f-effort">
+            <option value="quick">⚡ Quick (&lt;30 min)</option>
+            <option value="halfday">🕐 Half-day</option>
+            <option value="project">📦 Full Project</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">DEADLINE</label>
+          <input type="date" class="form-input" id="f-deadline"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">EST. COST ($)</label>
+          <input type="number" class="form-input" id="f-cost" placeholder="0" min="0"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">BLOCKED BY</label>
+          <input type="text" class="form-input" id="f-blocked" placeholder="What must happen first?"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">NOTES</label>
+        <textarea class="form-textarea" id="f-notes" placeholder="Context, links, next steps..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Rename Areas</div>
+      <button class="icon-btn" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:8px">Rename each area to match your projects and businesses.</p>
+      <div id="settings-areas"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeSettings()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Areas ───────────────────────────────────────────────────────────────────
+const AREAS = {
+  house:       {emoji:'🏠', default:'House'},
+  job:         {emoji:'✈️', default:'Priceline'},
+  personal:    {emoji:'👤', default:'Personal'},
+  sidehustle1: {emoji:'🎮', default:'Fun Projects'},
+  sidehustle2: {emoji:'📺', default:'Watch List'},
+  biz1:        {emoji:'🏢', default:'GLK'},
+  biz2:        {emoji:'🃏', default:'Play Years'},
+};
+
+// ─── Seed data ────────────────────────────────────────────────────────────────
+const SEED_TASKS = [
+  // GLK
+  {id:'s1',  done:false,area:'biz1',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Take me off payroll',notes:'Chris action item'},
+  {id:'s2',  done:false,area:'biz1',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'HST Remit',notes:'Financial deadline'},
+  {id:'s3',  done:false,area:'biz1',urgency:'high',effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'GLK taxes',notes:''},
+  {id:'s4',  done:false,area:'biz1',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'GitHub backups',notes:''},
+  {id:'s5',  done:false,area:'biz1',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Justin — write + invoice',notes:''},
+  {id:'s6',  done:false,area:'biz1',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Ed invoices',notes:'May be completed — verify'},
+  {id:'s7',  done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Nik — email',notes:''},
+  {id:'s8',  done:false,area:'biz1',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Tang — work + invoice',notes:''},
+  {id:'s9',  done:false,area:'biz1',urgency:'high',effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'HYP — finish + invoice',notes:''},
+  {id:'s10', done:false,area:'biz1',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Invoice Suzy',notes:'Circled on May 25 list'},
+  {id:'s11', done:false,area:'biz1',urgency:'high',effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'AM DS — password protect w/ encrypt',notes:'Security item'},
+  {id:'s12', done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'LT.com — add 3D nuclear + article',notes:''},
+  {id:'s13', done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Medium article — add screenshot + course',notes:''},
+  {id:'s14', done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Update Git w/ LT.com',notes:''},
+  {id:'s15', done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Astro — game of welcome + responsive',notes:''},
+  {id:'s16', done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Prep for interview — showcase AM or Astro',notes:''},
+  {id:'s17', done:false,area:'biz1',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                              title:'Judy.com — client website',notes:''},
+  {id:'s18', done:false,area:'biz1',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                              title:'Travis Hopkins.com — client website',notes:''},
+  {id:'s19', done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Krandar — check warped / new book / Faire',notes:''},
+  {id:'s20', done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Close BMO account',notes:''},
+  {id:'s21', done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'BMO ESOP — where?',notes:''},
+  {id:'s22', done:false,area:'biz1',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                              title:'LEAP website project',notes:'With GLK'},
+  {id:'s23', done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Design golf cart decal — Chris print',notes:''},
+  {id:'s24', done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Jari story about Alex',notes:'Follow up with Chris'},
+  // GLK clients
+  {id:'s111',done:false,area:'biz1',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'FanExpo — did we get the booth?',notes:''},
+  {id:'s112',done:false,area:'biz1',urgency:'high',effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Holiday Films — finish + invoice',notes:''},
+  {id:'s113',done:false,area:'biz1',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                              title:'Redwheels — home page + layouts + responsive',notes:''},
+  {id:'s114',done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Pineapple — fix Pardot + Facebook tracking',notes:''},
+  {id:'s115',done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Community One — rebuild quote + fix carousels',notes:''},
+  {id:'s116',done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Ryan Bone — email / build?',notes:''},
+  {id:'s117',done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'WATC — popup',notes:''},
+  {id:'s118',done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'YACC — make list of overtures',notes:''},
+  {id:'s119',done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Quote Andrew Carasco + send references',notes:''},
+  {id:'s120',done:false,area:'biz1',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Arts at Work — setup dev + invoice',notes:''},
+  // Astro Squad
+  {id:'s121',done:false,area:'biz1',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                              title:'Astro Squad — case study + proposal for CMF',notes:''},
+  {id:'s122',done:false,area:'biz1',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                              title:'Astro Squad — trademark name + logo',notes:''},
+  {id:'s123',done:false,area:'biz1',urgency:'low', effort:'project',deadline:'',cost:'',  blocked:'',                              title:'Astro Squad — create characters',notes:''},
+  {id:'s124',done:false,area:'biz1',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Astro Squad — copyright',notes:''},
+  // Play Years
+  {id:'s25', done:false,area:'biz2',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Take photo of card for Denoja',notes:''},
+  {id:'s26', done:false,area:'biz2',urgency:'high',effort:'project',deadline:'',cost:'',  blocked:'',                              title:'Make all cards',notes:'Core production task'},
+  {id:'s27', done:false,area:'biz2',urgency:'high',effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Cover card + legend',notes:''},
+  {id:'s28', done:false,area:'biz2',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'Make all cards',                title:'Add hole + indicator to cards',notes:''},
+  {id:'s29', done:false,area:'biz2',urgency:'med', effort:'quick',  deadline:'',cost:'20',blocked:'Cover card + legend',           title:'Test print card @ Staples',notes:''},
+  {id:'s30', done:false,area:'biz2',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Box sticker — Made in Canada',notes:''},
+  {id:'s31', done:false,area:'biz2',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                              title:'Play Years website design',notes:''},
+  {id:'s32', done:false,area:'biz2',urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'Make all cards',                title:'Send Play Years cards to Amazon',notes:''},
+  {id:'s33', done:false,area:'biz2',urgency:'high',effort:'halfday',deadline:'',cost:'',  blocked:'Send Play Years cards to Amazon',title:'Launch on Amazon',notes:''},
+  {id:'s34', done:false,area:'biz2',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Faire marketplace listing',notes:''},
+  {id:'s35', done:false,area:'biz2',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Email contact list',notes:''},
+  {id:'s36', done:false,area:'biz2',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Instagram post + boost',notes:''},
+  {id:'s37', done:false,area:'biz2',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Drop off giveaway',notes:''},
+  {id:'s38', done:false,area:'biz2',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Wholesale price sheet',notes:''},
+  {id:'s39', done:false,area:'biz2',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                              title:'Play Years marketing plan',notes:''},
+  {id:'s40', done:false,area:'biz2',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Buy shrink wrap + plastic loops',notes:'Supplies'},
+  // Priceline
+  {id:'s41', done:false,area:'job', urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Book off Nov 16 + February Mexico',notes:'Through Priceline time-off system'},
+  {id:'s42', done:false,area:'job', urgency:'high',effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'Follow up w/ Wes — vacation request',notes:''},
+  {id:'s43', done:false,area:'job', urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                              title:'COMP — postpone pros',notes:''},
+  // Personal
+  {id:'s44', done:false,area:'personal',urgency:'high',effort:'quick',deadline:'2026-08-01',cost:'35',blocked:'',                  title:'Arrange babysitter for Nara — Aug 7',notes:'Check if mom can watch Nara'},
+  {id:'s45', done:false,area:'personal',urgency:'high',effort:'quick',deadline:'2026-07-25',cost:'', blocked:'',                   title:'Confirm mom to watch Nara on Aug 7',notes:''},
+  {id:'s46', done:false,area:'personal',urgency:'med', effort:'quick',deadline:'',cost:'45',blocked:'',                            title:'Lance gift',notes:'$45 budget'},
+  {id:'s47', done:false,area:'personal',urgency:'med', effort:'halfday',deadline:'',cost:'',blocked:'',                            title:'KMM — fix tire + tuneup',notes:''},
+  {id:'s48', done:false,area:'personal',urgency:'low', effort:'halfday',deadline:'',cost:'',blocked:'',                            title:'Clean motorcycle',notes:''},
+  {id:'s49', done:false,area:'personal',urgency:'low', effort:'quick',deadline:'',cost:'', blocked:'Clean motorcycle',             title:'Degrease chain + oil',notes:''},
+  // House
+  {id:'s50', done:false,area:'house',urgency:'high',effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Fix hot tub wire',notes:'Safety — do first'},
+  {id:'s51', done:false,area:'house',urgency:'high',effort:'quick',  deadline:'',cost:'30',blocked:'',                             title:'Replace furnace filter',notes:''},
+  {id:'s52', done:false,area:'house',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Replace outlet in driveway',notes:''},
+  {id:'s53', done:false,area:'house',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Fix outlet in basement closet — wire in rafter',notes:''},
+  {id:'s54', done:false,area:'house',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Fix basement wire',notes:''},
+  {id:'s55', done:false,area:'house',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Fix side steps',notes:'On both lists'},
+  {id:'s56', done:false,area:'house',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                             title:'Electrical to shed',notes:''},
+  {id:'s57', done:false,area:'house',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Fix split siding over door',notes:''},
+  {id:'s58', done:false,area:'house',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'New electrical panel map',notes:''},
+  {id:'s59', done:false,area:'house',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'New electrical panel map',      title:'Label breakers',notes:''},
+  {id:'s60', done:false,area:'house',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'City water shut off — know location',notes:''},
+  {id:'s61', done:false,area:'house',urgency:'med', effort:'project',deadline:'',cost:'',  blocked:'',                             title:'Shower wall glass',notes:''},
+  {id:'s62', done:false,area:'house',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:"Buy 8' PVC",notes:''},
+  {id:'s63', done:false,area:'house',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'Buy PVC cement',notes:''},
+  {id:'s64', done:false,area:'house',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'Buy white silicone',notes:''},
+  {id:'s65', done:false,area:'house',urgency:'med', effort:'halfday',deadline:'',cost:'',  blocked:"Buy 8' PVC, PVC cement, white silicone",title:'Make BBQ access to trap',notes:''},
+  {id:'s66', done:false,area:'house',urgency:'low', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Fan in attic window',notes:''},
+  {id:'s67', done:false,area:'house',urgency:'low', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Organize tool boxes',notes:''},
+  {id:'s68', done:false,area:'house',urgency:'low', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'Touch up blue paint',notes:''},
+  {id:'s69', done:false,area:'house',urgency:'low', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'Mount TP holder',notes:''},
+  {id:'s70', done:false,area:'house',urgency:'low', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'New kitchen drawer tabs',notes:''},
+  {id:'s71', done:false,area:'house',urgency:'low', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'Fix butterfly frames',notes:''},
+  {id:'s72', done:false,area:'house',urgency:'low', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Clean basement',notes:''},
+  {id:'s73', done:false,area:'house',urgency:'low', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Hallway art',notes:''},
+  {id:'s74', done:false,area:'house',urgency:'low', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Hot tub table / side table',notes:''},
+  {id:'s75', done:false,area:'house',urgency:'low', effort:'halfday',deadline:'',cost:'',  blocked:'',                             title:'Hot tub stand',notes:''},
+  {id:'s76', done:false,area:'house',urgency:'low', effort:'project',deadline:'',cost:'',  blocked:'',                             title:'Backyard TV',notes:''},
+  {id:'s77', done:false,area:'house',urgency:'med', effort:'quick',  deadline:'',cost:'',  blocked:'',                             title:'Water shut off — know location',notes:''},
+  // Fun Projects
+  {id:'s78', done:false,area:'sidehustle1',urgency:'med', effort:'quick',  deadline:'',cost:'',blocked:'',title:'Fix Oculus',notes:''},
+  {id:'s79', done:false,area:'sidehustle1',urgency:'med', effort:'quick',  deadline:'',cost:'',blocked:'',title:'Pre-order GTA6',notes:''},
+  {id:'s80', done:false,area:'sidehustle1',urgency:'low', effort:'halfday',deadline:'',cost:'',blocked:'',title:'Shell bracelet',notes:''},
+  {id:'s81', done:false,area:'sidehustle1',urgency:'low', effort:'project',deadline:'',cost:'',blocked:'',title:'Outdoor stained glass art — design + build',notes:''},
+  {id:'s82', done:false,area:'sidehustle1',urgency:'low', effort:'project',deadline:'',cost:'',blocked:'',title:'Army helmet lamp — buy helmet, order parts, build',notes:''},
+  {id:'s83', done:false,area:'sidehustle1',urgency:'low', effort:'project',deadline:'',cost:'',blocked:'',title:'Build Arduino lightbulb project',notes:''},
+  {id:'s84', done:false,area:'sidehustle1',urgency:'low', effort:'project',deadline:'',cost:'',blocked:'',title:'Wood glass thing',notes:''},
+  {id:'s85', done:false,area:'sidehustle1',urgency:'low', effort:'quick',  deadline:'',cost:'',blocked:'',title:'Play Starfox',notes:''},
+  {id:'s86', done:false,area:'sidehustle1',urgency:'low', effort:'halfday',deadline:'',cost:'',blocked:'',title:'Pass Ghost of Yotel',notes:''},
+  {id:'s240',done:false,area:'sidehustle1',urgency:'low', effort:'halfday',deadline:'',cost:'',blocked:'',title:'Play: Zelda — A Link to the Past',notes:''},
+  {id:'s241',done:false,area:'sidehustle1',urgency:'low', effort:'halfday',deadline:'',cost:'',blocked:'',title:"Play: Zelda — Link's Awakening",notes:''},
+  {id:'s242',done:false,area:'sidehustle1',urgency:'low', effort:'halfday',deadline:'',cost:'',blocked:'',title:'Play: Super Mario World',notes:''},
+  {id:'s243',done:false,area:'sidehustle1',urgency:'low', effort:'halfday',deadline:'',cost:'',blocked:'',title:'Play: Megaman',notes:''},
+  // Watch List
+  {id:'s87', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Squid Game 3',notes:''},
+  {id:'s88', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: The Assessment',notes:''},
+  {id:'s89', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Frankenstein',notes:''},
+  {id:'s90', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Black Phone 1 & 2',notes:''},
+  {id:'s91', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Good Boy',notes:''},
+  {id:'s92', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Minecraft Movie',notes:''},
+  {id:'s93', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Avatar',notes:''},
+  {id:'s94', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Men in Black',notes:''},
+  {id:'s95', done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Jungle Cruise',notes:''},
+  {id:'s200',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Land Before Time',notes:''},
+  {id:'s201',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: All Dogs Go to Heaven',notes:''},
+  {id:'s202',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Blank Cheque',notes:''},
+  {id:'s203',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Short Circuit',notes:''},
+  {id:'s204',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Jurassic Park',notes:''},
+  {id:'s205',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: John Carter',notes:''},
+  {id:'s206',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch: Star Wars Trilogy',notes:'3 films'},
+  {id:'s207',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch: All Ghibli Films',notes:''},
+  {id:'s208',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Adventures in Babysitting',notes:''},
+  {id:'s209',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch: Indiana Jones (series)',notes:''},
+  {id:'s210',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Sahara',notes:''},
+  {id:'s211',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: National Treasure',notes:''},
+  {id:'s212',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Stargate',notes:''},
+  {id:'s213',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Labyrinth',notes:''},
+  {id:'s214',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Dark Crystal',notes:''},
+  {id:'s215',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Honey I Shrunk the Kids',notes:''},
+  {id:'s216',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Lilo and Stitch',notes:''},
+  {id:'s217',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: The Mummy',notes:''},
+  {id:'s218',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Mystery Men',notes:''},
+  {id:'s219',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Mannequin',notes:''},
+  {id:'s220',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Addicted to Love',notes:''},
+  {id:'s221',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch: Star Trek remixes',notes:''},
+  {id:'s222',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Galaxy Quest',notes:''},
+  {id:'s223',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Alita: Battle Angel',notes:''},
+  {id:'s224',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: City of Ember',notes:''},
+  {id:'s225',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Jumanji',notes:''},
+  {id:'s226',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch: Back to the Future (trilogy)',notes:''},
+  {id:'s227',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Uncharted',notes:''},
+  {id:'s228',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: The Big Hit',notes:''},
+  {id:'s229',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Pagemaster',notes:''},
+  {id:'s230',done:false,area:'sidehustle2',urgency:'low',effort:'quick',  deadline:'',cost:'',blocked:'',title:'Watch: Secret of NiMH',notes:''},
+  {id:'s231',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch TV: Tailspin',notes:''},
+  {id:'s232',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch TV: Chip and Dale',notes:''},
+  {id:'s233',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch TV: Darkwing Duck',notes:''},
+  {id:'s234',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch TV: Gummy Bears',notes:''},
+  {id:'s235',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch TV: Farscape',notes:''},
+  {id:'s236',done:false,area:'sidehustle2',urgency:'low',effort:'project',deadline:'',cost:'',blocked:'',title:'Watch TV: Lost in Space',notes:''},
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let tasks = [], settings = {};
+let activeArea='all', activeStatus='active';
+let urgencyFilter='all', effortFilter='all', searchQuery='';
+let currentView='list';
+let tokenClient, accessToken=null;
+let saveTimer=null;
+
+// ─── Google Auth ──────────────────────────────────────────────────────────────
+window.onload = () => {
+  if (typeof google === 'undefined') {
+    setTimeout(window.onload, 500); return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    callback: async (resp) => {
+      if (resp.error) { setSyncStatus('error','Sign-in failed'); return; }
+      accessToken = resp.access_token;
+      showApp();
+      await loadFromSheet();
+    }
+  });
+  // Show mobile menu button on small screens
+  if (window.innerWidth <= 640) document.getElementById('menu-btn').style.display='block';
+};
+
+function signIn() { tokenClient.requestAccessToken({prompt:''}); }
+
+function signOut() {
+  google.accounts.oauth2.revoke(accessToken, ()=>{
+    accessToken=null;
+    document.getElementById('app').style.display='none';
+    document.getElementById('signin-screen').style.display='flex';
+  });
+}
+
+function showApp() {
+  document.getElementById('signin-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+}
+
+// ─── Google Sheets I/O ────────────────────────────────────────────────────────
+async function loadFromSheet() {
+  setSyncStatus('saving','Loading...');
+  try {
+    const res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!A1:B1`,
+      {headers:{Authorization:`Bearer ${accessToken}`}}
+    );
+    if (res.status===401){tokenClient.requestAccessToken({prompt:''});return;}
+    const data = await res.json();
+    const vals = data.values?.[0] || [];
+    tasks    = vals[0] ? JSON.parse(vals[0]) : [];
+    settings = vals[1] ? JSON.parse(vals[1]) : {};
+    if (!tasks.length) {
+      tasks = SEED_TASKS.map((t,i)=>({...t,createdAt:Date.now()-i*1000}));
+      await saveToSheet();
+    }
+    applyAreaLabels(); rebuildAreaSelect(); renderAll();
+    setSyncStatus('saved','Synced ✓');
+    setTimeout(()=>setSyncStatus('',''),2000);
+  } catch(e) { setSyncStatus('error','Load failed'); console.error(e); }
+}
+
+async function saveToSheet() {
+  setSyncStatus('saving','Saving...');
+  try {
+    const res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!A1:B1?valueInputOption=RAW`,
+      {
+        method:'PUT',
+        headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json'},
+        body:JSON.stringify({values:[[JSON.stringify(tasks),JSON.stringify(settings)]]})
+      }
+    );
+    if (res.status===401){tokenClient.requestAccessToken({prompt:''});return;}
+    setSyncStatus('saved','Saved ✓');
+    setTimeout(()=>setSyncStatus('',''),2000);
+  } catch(e) { setSyncStatus('error','Save failed'); }
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveToSheet, 800);
+}
+
+function setSyncStatus(cls, msg) {
+  const el = document.getElementById('sync-indicator');
+  el.className = 'sync-indicator' + (cls?' '+cls:'');
+  el.textContent = msg;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function areaName(k){return settings[k]||AREAS[k]?.default||k}
+function isOverdue(t){if(!t.deadline||t.done)return false;return new Date(t.deadline+'T00:00:00')<new Date(new Date().toDateString())}
+function isDueSoon(t){if(!t.deadline||t.done)return false;return(new Date(t.deadline+'T00:00:00')-new Date())/86400000<=7 && !isOverdue(t)}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function applyAreaLabels(){Object.keys(AREAS).forEach(k=>{const el=document.getElementById('area-label-'+k);if(el)el.textContent=areaName(k)})}
+function rebuildAreaSelect(){
+  document.getElementById('f-area').innerHTML=Object.keys(AREAS).map(k=>
+    `<option value="${k}">${AREAS[k].emoji} ${escHtml(areaName(k))}</option>`).join('');
+}
+
+// ─── Filters ──────────────────────────────────────────────────────────────────
+function filterArea(a){
+  activeArea=a; activeStatus='active';
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-'+a)?.classList.add('active');
+  render();
+}
+function filterStatus(s){
+  activeStatus=s; activeArea='all';
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-'+s)?.classList.add('active');
+  render();
+}
+function toggleFilter(type,val){
+  if(type==='urgency'){urgencyFilter=val;document.querySelectorAll('[id^="f-urgency-"]').forEach(b=>b.classList.remove('active'));document.getElementById('f-urgency-'+val)?.classList.add('active');}
+  else{effortFilter=val;document.querySelectorAll('[id^="f-effort-"]').forEach(b=>b.classList.remove('active'));document.getElementById('f-effort-'+val)?.classList.add('active');}
+  render();
+}
+function searchTasks(q){searchQuery=q.toLowerCase();render();}
+
+function getFiltered(){
+  return tasks.filter(t=>{
+    if(activeStatus==='done'&&!t.done)return false;
+    if(activeStatus==='active'&&t.done)return false;
+    if(activeArea==='due-soon'&&(!isDueSoon(t)||t.done))return false;
+    if(activeArea==='overdue'&&(!isOverdue(t)||t.done))return false;
+    if(!['all','due-soon','overdue','active','done'].includes(activeArea)&&t.area!==activeArea)return false;
+    if(urgencyFilter!=='all'&&t.urgency!==urgencyFilter)return false;
+    if(effortFilter!=='all'&&t.effort!==effortFilter)return false;
+    if(searchQuery){const h=(t.title+(t.notes||'')+(t.blocked||'')).toLowerCase();if(!h.includes(searchQuery))return false;}
+    return true;
+  });
+}
+
+function sortTasks(list){
+  const uo={high:0,med:1,low:2};
+  return list.slice().sort((a,b)=>{
+    if(a.done!==b.done)return a.done?1:-1;
+    const oa=isOverdue(a)?-1:0,ob=isOverdue(b)?-1:0;
+    if(oa!==ob)return oa-ob;
+    const ua=uo[a.urgency]??1,ub=uo[b.urgency]??1;
+    if(ua!==ub)return ua-ub;
+    if(a.deadline&&b.deadline)return new Date(a.deadline)-new Date(b.deadline);
+    if(a.deadline)return-1;if(b.deadline)return 1;
+    return 0;
+  });
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function updateCounts(){
+  const ac=tasks.filter(t=>!t.done);
+  document.getElementById('count-all').textContent=ac.length;
+  document.getElementById('count-overdue').textContent=ac.filter(isOverdue).length;
+  document.getElementById('count-due-soon').textContent=ac.filter(isDueSoon).length;
+  Object.keys(AREAS).forEach(k=>{const el=document.getElementById('count-'+k);if(el)el.textContent=ac.filter(t=>t.area===k).length;});
+  document.getElementById('stat-total').textContent=ac.length;
+  document.getElementById('stat-urgent').textContent=ac.filter(t=>t.urgency==='high').length;
+  document.getElementById('stat-duesoon').textContent=ac.filter(isDueSoon).length;
+  document.getElementById('stat-overdue').textContent=ac.filter(isOverdue).length;
+  document.getElementById('stat-done').textContent=tasks.filter(t=>t.done).length;
+}
+function renderAll(){updateCounts();render();}
+
+function render(){
+  if(currentView==='weekly'){renderWeekly();return;}
+  const list=sortTasks(getFiltered());
+  const el=document.getElementById('task-list');
+  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="emoji">✨</div><p>No tasks here.</p></div>`;return;}
+  el.innerHTML=list.map(renderCard).join('');
+}
+
+function renderCard(t){
+  const area=AREAS[t.area];
+  const urgMap={high:['tag-urgency-high','🔴 High'],med:['tag-urgency-med','🟡 Med'],low:['tag-urgency-low','🟢 Low']};
+  const effMap={quick:['tag-effort-quick','⚡ Quick'],halfday:['tag-effort-halfday','🕐 Half'],project:['tag-effort-project','📦 Project']};
+  const[uc,ul]=urgMap[t.urgency]||urgMap.med;
+  const[ec,el_]=effMap[t.effort]||effMap.quick;
+  let dl='';
+  if(t.deadline){const ov=isOverdue(t);const ds=new Date(t.deadline+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});dl=`<span class="tag tag-deadline ${ov?'overdue':''}">📅${ov?' ⚠️':''} ${ds}</span>`;}
+  const cost=t.cost?`<span class="tag tag-cost">💰 $${Number(t.cost).toLocaleString()}</span>`:'';
+  const blocked=t.blocked?`<div class="task-blocked">⛔ ${escHtml(t.blocked)}</div>`:'';
+  const notes=t.notes?`<div class="task-notes">${escHtml(t.notes)}</div>`:'';
+  return`<div class="task-card ${t.done?'done':''}">
+    <div class="task-check ${t.done?'checked':''}" onclick="toggleDone('${t.id}')"></div>
+    <div class="task-body">
+      <div class="task-title">${escHtml(t.title)}</div>
+      <div class="task-meta"><span class="tag tag-area">${area?.emoji||'📌'} ${escHtml(areaName(t.area))}</span><span class="tag ${uc}">${ul}</span><span class="tag ${ec}">${el_}</span>${dl}${cost}</div>
+      ${blocked}${notes}
+    </div>
+    <div class="task-actions">
+      <button class="icon-btn" onclick="editTask('${t.id}')">✏️</button>
+      <button class="icon-btn delete" onclick="deleteTask('${t.id}')">🗑️</button>
+    </div>
+  </div>`;
+}
+
+function renderWeekly(){
+  const el=document.getElementById('weekly-view');
+  const ac=tasks.filter(t=>!t.done);
+  const ov=ac.filter(isOverdue),dw=ac.filter(isDueSoon);
+  const top5=sortTasks(ac).slice(0,5);
+  const areaRows=Object.keys(AREAS).map(k=>{
+    const c=ac.filter(t=>t.area===k).length;if(!c)return'';
+    const h=ac.filter(t=>t.area===k&&t.urgency==='high').length;
+    return`<div class="weekly-task-row"><span style="font-size:16px">${AREAS[k].emoji}</span><span style="flex:1;font-size:13px;font-weight:500">${escHtml(areaName(k))}</span><span style="font-size:12px;color:var(--muted)">${c} task${c!==1?'s':''}</span>${h?`<span class="tag tag-urgency-high">${h} high</span>`:''}</div>`;
+  }).join('');
+  el.innerHTML=`
+    <div style="font-size:17px;font-weight:700;margin-bottom:2px">📋 Weekly Briefing</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
+    ${ov.length?`<div class="weekly-section"><div class="weekly-section-header" style="background:#fee2e2;color:#b91c1c">⚠️ Overdue (${ov.length})</div><div class="weekly-section-body">${ov.map(t=>wRow(t)).join('')}</div></div>`
+    :`<div class="weekly-section"><div class="weekly-section-header" style="background:#f0fdf4;color:#166534">✅ Nothing overdue!</div></div>`}
+    <div class="weekly-section"><div class="weekly-section-header">🔥 Due This Week (${dw.length})</div><div class="weekly-section-body">${dw.length?dw.map(t=>wRow(t)).join(''):'<div style="font-size:13px;color:var(--muted);padding:8px 0">Nothing due this week.</div>'}</div></div>
+    <div class="weekly-section"><div class="weekly-section-header">⭐ Top 5 Priorities</div><div class="weekly-section-body">${top5.map((t,i)=>wRow(t,i+1)).join('')}</div></div>
+    <div class="weekly-section"><div class="weekly-section-header">📊 By Area</div><div class="weekly-section-body">${areaRows||'<div style="font-size:13px;color:var(--muted);padding:8px 0">No active tasks.</div>'}</div></div>`;
+}
+
+function wRow(t,num){
+  const ue={high:'🔴',med:'🟡',low:'🟢'}[t.urgency]||'';
+  const dl=t.deadline?new Date(t.deadline+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
+  return`<div class="weekly-task-row">${num!==undefined?`<span style="font-size:12px;color:var(--muted);min-width:18px;text-align:center">${num}</span>`:''}<span>${ue}</span><span style="flex:1;font-size:13px">${escHtml(t.title)}</span><span style="font-size:11px;color:var(--muted)">${escHtml(areaName(t.area))}</span>${dl?`<span class="tag tag-deadline" style="font-size:11px">${dl}</span>`:''}</div>`;
+}
+
+// ─── View switching ───────────────────────────────────────────────────────────
+function switchView(v){
+  currentView=v;
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.view-btn').forEach(b=>{if(b.textContent.trim()===(v==='list'?'Tasks':'Weekly'))b.classList.add('active');});
+  document.querySelectorAll('.mobile-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('task-list').style.display=v==='list'?'flex':'none';
+  document.getElementById('weekly-view').style.display=v==='weekly'?'flex':'none';
+  document.getElementById('stats-bar').style.display=v==='list'?'flex':'none';
+  render();
+}
+
+// ─── Sidebar (mobile) ─────────────────────────────────────────────────────────
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
+
+// ─── Task CRUD ────────────────────────────────────────────────────────────────
+function openAddModal(){
+  document.getElementById('modal-title').textContent='Add Task';
+  document.getElementById('edit-id').value='';
+  ['f-title','f-deadline','f-cost','f-blocked','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-urgency').value='med';
+  document.getElementById('f-effort').value='quick';
+  document.getElementById('task-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('f-title').focus(),100);
+}
+function editTask(id){
+  const t=tasks.find(t=>t.id===id);if(!t)return;
+  document.getElementById('modal-title').textContent='Edit Task';
+  document.getElementById('edit-id').value=id;
+  document.getElementById('f-title').value=t.title;
+  document.getElementById('f-area').value=t.area;
+  document.getElementById('f-urgency').value=t.urgency;
+  document.getElementById('f-effort').value=t.effort;
+  document.getElementById('f-deadline').value=t.deadline||'';
+  document.getElementById('f-cost').value=t.cost||'';
+  document.getElementById('f-blocked').value=t.blocked||'';
+  document.getElementById('f-notes').value=t.notes||'';
+  document.getElementById('task-modal').classList.add('open');
+}
+function saveTask(){
+  const title=document.getElementById('f-title').value.trim();
+  if(!title){document.getElementById('f-title').focus();return;}
+  const editId=document.getElementById('edit-id').value;
+  const data={title,area:document.getElementById('f-area').value,urgency:document.getElementById('f-urgency').value,effort:document.getElementById('f-effort').value,deadline:document.getElementById('f-deadline').value||'',cost:document.getElementById('f-cost').value||'',blocked:document.getElementById('f-blocked').value.trim(),notes:document.getElementById('f-notes').value.trim()};
+  if(editId){const i=tasks.findIndex(t=>t.id===editId);if(i!==-1)tasks[i]={...tasks[i],...data};}
+  else tasks.push({id:Date.now().toString(),done:false,createdAt:Date.now(),...data});
+  scheduleSave();closeModal();renderAll();
+}
+function deleteTask(id){
+  if(!confirm('Delete this task?'))return;
+  tasks=tasks.filter(t=>t.id!==id);scheduleSave();renderAll();
+}
+function toggleDone(id){
+  const t=tasks.find(t=>t.id===id);
+  if(t){t.done=!t.done;t.doneAt=t.done?Date.now():null;}
+  scheduleSave();renderAll();
+}
+function closeModal(){document.getElementById('task-modal').classList.remove('open');}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+function openSettings(){
+  document.getElementById('settings-areas').innerHTML=Object.keys(AREAS).map(k=>
+    `<div class="settings-area-row"><span style="font-size:20px">${AREAS[k].emoji}</span><input class="settings-area-input" id="setting-${k}" value="${escHtml(areaName(k))}" placeholder="${AREAS[k].default}"/></div>`).join('');
+  document.getElementById('settings-modal').classList.add('open');
+}
+function saveSettings(){
+  Object.keys(AREAS).forEach(k=>{const v=document.getElementById('setting-'+k)?.value.trim();if(v)settings[k]=v;});
+  scheduleSave();applyAreaLabels();rebuildAreaSelect();closeSettings();render();
+}
+function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
+
+// ─── Keyboard shortcuts ───────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();closeSettings();closeSidebar();}
+  if(e.key==='n'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();
+});
+document.getElementById('task-modal').addEventListener('click',e=>{if(e.target.id==='task-modal')closeModal();});
+document.getElementById('settings-modal').addEventListener('click',e=>{if(e.target.id==='settings-modal')closeSettings();});
+</script>
+</body>
+</html>
