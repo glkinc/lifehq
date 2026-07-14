@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Life HQ</title>
+<script>
+  // Fast theme init before render — avoids flash
+  (function(){
+    const pref=localStorage.getItem('lifehq_theme')||'auto';
+    const dark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme',pref==='auto'?(dark?'dark':'light'):pref);
+  })();
+</script>
 <script>
   const CLIENT_ID = '48534488595-9df83hvfg0mqa91k3qll8bin7jml9pi0.apps.googleusercontent.com';
   const SHEET_ID  = '1rZBAhQ1ZD1WBPuQqiHxodNvxSvcWIxC_N3P7ytnu_g0';
@@ -11,33 +19,62 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css"/>
 <style>
-:root {
+/* ─── Dark theme (default) ─────────────────────────────────────────────────── */
+:root,[data-theme="dark"]{
   --bg:#0F0F13;
   --surface:#18181D;
   --surface2:#222229;
+  --surface3:#2A2A33;
   --border:#2C2C38;
   --text:#F0F0F8;
+  --text2:#C0C0D0;
   --muted:#7878A0;
-  --accent:#8B7FFF;
-  --accent-dim:rgba(139,127,255,.15);
+  --accent:#00A8E8;
+  --accent-dim:rgba(0,168,232,.15);
   --green:#00D632;
   --green-dim:rgba(0,214,50,.15);
   --red:#FF3B30;
   --red-dim:rgba(255,59,48,.15);
   --orange:#FF9F0A;
   --orange-dim:rgba(255,159,10,.15);
+  --purple:#9B7FFF;
+  --purple-dim:rgba(155,127,255,.12);
+  --shadow:rgba(0,0,0,.4);
   --radius:14px;
   --tap:52px;
 }
+/* ─── Light theme ──────────────────────────────────────────────────────────── */
+[data-theme="light"]{
+  --bg:#F2F2F7;
+  --surface:#FFFFFF;
+  --surface2:#F2F2F7;
+  --surface3:#E8E8EF;
+  --border:#D1D1D6;
+  --text:#1C1C1E;
+  --text2:#48484A;
+  --muted:#8E8E93;
+  --accent:#00A8E8;
+  --accent-dim:rgba(0,168,232,.12);
+  --green:#34C759;
+  --green-dim:rgba(52,199,89,.12);
+  --red:#FF3B30;
+  --red-dim:rgba(255,59,48,.12);
+  --orange:#FF9500;
+  --orange-dim:rgba(255,149,0,.12);
+  --purple:#9B7FFF;
+  --purple-dim:rgba(155,127,255,.1);
+  --shadow:rgba(0,0,0,.12);
+}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overscroll-behavior:none}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden;transition:background .2s,color .2s}
 
 /* ─── Sign-in ─────────────────────────────────────────────────────────────── */
 #signin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:28px;padding:40px 24px;text-align:center}
 .signin-logo{font-size:64px;line-height:1}
 .signin-title{font-size:30px;font-weight:700;letter-spacing:-.5px}
-.signin-sub{font-size:15px;color:var(--muted);max-width:280px;line-height:1.6}
+.signin-sub{font-size:15px;color:var(--muted);max-width:280px;line-height:1.6;margin-top:6px}
 .signin-btn{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 24px;font-size:16px;font-weight:600;color:var(--text);cursor:pointer;width:100%;max-width:300px;justify-content:center;transition:background .15s}
 .signin-btn:active{background:var(--surface2)}
 .signin-btn svg{width:22px;height:22px;flex-shrink:0}
@@ -45,75 +82,50 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ─── App shell ───────────────────────────────────────────────────────────── */
 #app{display:none;flex-direction:column;flex:1;overflow:hidden}
 
-/* ─── Header (3 rows) ─────────────────────────────────────────────────────── */
+/* ─── Header ─────────────────────────────────────────────────────────────── */
 .header{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
-.header-row1{display:flex;align-items:center;padding:14px 16px 10px;gap:12px}
-.header-logo{display:flex;align-items:center;gap:8px}
-.header-logo .ph{font-size:22px;color:var(--accent)}
+.header-row1{display:flex;align-items:center;padding:14px 16px 12px;gap:10px}
+.header-logo{display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0}
+.header-logo-icon{font-size:22px;color:var(--accent)}
 .header-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
-.header-search{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;min-width:140px}
+.header-search{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px}
 .header-search .ph{font-size:16px;color:var(--muted);flex-shrink:0}
-.header-search input{background:transparent;border:none;outline:none;font-size:14px;color:var(--text);width:100%;min-width:80px}
+.header-search input{background:transparent;border:none;outline:none;font-size:14px;color:var(--text);width:100%}
 .header-search input::placeholder{color:var(--muted)}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
-.sync-dot.saving{background:var(--orange)}
-.sync-dot.saved{background:var(--green)}
-.sync-dot.error{background:var(--red)}
 
-.filter-row{display:flex;gap:8px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}
-.filter-row::-webkit-scrollbar{display:none}
-.filter-row-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;align-self:center;flex-shrink:0;margin-right:2px}
-.chip{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;min-height:36px}
-.chip:active{opacity:.7}
-.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.chip .ph{font-size:14px}
-
-/* ─── Stats grid ──────────────────────────────────────────────────────────── */
-.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px 16px;flex-shrink:0}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.stat-card:active{background:var(--surface2)}
-.stat-card.active{border-color:var(--accent);background:var(--accent-dim)}
-.stat-num{font-size:22px;font-weight:700;line-height:1}
-.stat-label{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.2}
+/* ─── Tabs ────────────────────────────────────────────────────────────────── */
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 2px 8px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;user-select:none;gap:2px}
+.tab-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;letter-spacing:.01em;transition:color .15s}
+.tab-count{font-size:16px;font-weight:700;color:var(--muted);transition:color .15s;line-height:1}
+.tab.active .tab-label{color:var(--accent)}
+.tab.active .tab-count{color:var(--accent)}
+.tab.active{border-bottom-color:var(--accent)}
+.tab:active{background:var(--surface2)}
 
 /* ─── Main layout ─────────────────────────────────────────────────────────── */
 .main{display:flex;flex:1;overflow:hidden}
-
-/* ─── Sidebar ─────────────────────────────────────────────────────────────── */
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49;backdrop-filter:blur(2px)}
-.sidebar-overlay.open{display:block}
-.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
-@media(max-width:700px){
-  .sidebar{display:none;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:4px 0 30px rgba(0,0,0,.5)}
-  .sidebar.open{display:flex}
-}
-.sidebar-inner{padding:16px 12px;flex:1}
-.sidebar-section{margin-bottom:24px}
-.sidebar-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:0 10px;margin-bottom:6px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:0 10px;border-radius:10px;cursor:pointer;font-size:14px;color:var(--muted);min-height:var(--tap);transition:all .12s;user-select:none}
-.nav-item .ph{font-size:20px;flex-shrink:0}
-.nav-item:active{background:var(--surface2)}
-.nav-item.active{background:var(--accent-dim);color:var(--accent)}
-.nav-item.active .ph{color:var(--accent)}
-.nav-item-text{flex:1}
-.nav-count{font-size:12px;background:var(--surface2);border-radius:10px;padding:2px 8px;color:var(--muted)}
-.nav-item.active .nav-count{background:var(--accent);color:#fff}
-
-/* ─── Content ─────────────────────────────────────────────────────────────── */
 .content{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
 /* ─── Task list ───────────────────────────────────────────────────────────── */
-.task-list{flex:1;overflow-y:auto;padding:10px 14px 100px;display:flex;flex-direction:column;gap:8px}
+.task-list{flex:1;overflow-y:auto;padding:10px 14px 100px;display:flex;flex-direction:column}
+
+/* Area group */
+.area-group{margin-bottom:4px}
+.area-group-header{display:flex;align-items:center;gap:8px;padding:14px 4px 8px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.area-group-header .ph{font-size:16px;color:var(--accent)}
+.area-group-tasks{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.area-group-empty{font-size:13px;color:var(--muted);padding:8px 4px 16px;font-style:italic}
 
 /* Swipe wrapper */
 .task-wrapper{position:relative;border-radius:var(--radius);overflow:hidden;flex-shrink:0}
-.swipe-bg{position:absolute;inset:0;display:flex;align-items:center;border-radius:var(--radius);transition:opacity .15s}
+.swipe-bg{position:absolute;inset:0;display:flex;align-items:center;border-radius:var(--radius)}
 .swipe-bg-right{background:var(--green);padding-left:20px;justify-content:flex-start;opacity:0}
 .swipe-bg-right .ph{font-size:26px;color:#fff}
 .swipe-bg-left{background:var(--red);padding-right:20px;justify-content:flex-end;opacity:0}
 .swipe-bg-left .ph{font-size:26px;color:#fff}
 
-.task-card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;gap:12px;align-items:flex-start;will-change:transform;transition:box-shadow .15s;z-index:1}
+.task-card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;gap:12px;align-items:flex-start;will-change:transform;z-index:1;transition:box-shadow .15s}
 .task-card.done{opacity:.4}
 .task-card.done .task-title{text-decoration:line-through;color:var(--muted)}
 
@@ -124,18 +136,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .task-check .ph{font-size:14px;color:var(--muted)}
 
 .task-body{flex:1;min-width:0}
-.task-title{font-size:15px;font-weight:500;margin-bottom:6px;line-height:1.4}
+.task-title{font-size:15px;font-weight:500;margin-bottom:4px;line-height:1.4}
 .task-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.tag{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;letter-spacing:.01em}
-.tag-area{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
-.tag-urgency-high{background:var(--red-dim);color:#FF6B63}
-.tag-urgency-med{background:var(--orange-dim);color:var(--orange)}
-.tag-urgency-low{background:var(--green-dim);color:var(--green)}
-.tag-effort-low{background:rgba(100,180,255,.12);color:#64B4FF}
-.tag-effort-medium{background:rgba(160,125,255,.12);color:#A07DFF}
-.tag-effort-high{background:rgba(255,159,10,.12);color:var(--orange)}
-.tag-effort-huge{background:rgba(255,59,48,.12);color:#FF6B63}
-.tag-deadline{background:rgba(255,159,10,.12);color:var(--orange)}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+.tag-deadline{background:var(--orange-dim);color:var(--orange)}
 .tag-deadline.overdue{background:var(--red-dim);color:#FF6B63;font-weight:700}
 .task-notes{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5}
 .task-blocked{font-size:12px;color:var(--orange);margin-top:4px;display:flex;align-items:center;gap:4px}
@@ -146,10 +150,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .icon-btn{width:36px;height:36px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .1s}
 .icon-btn:hover{background:var(--surface2)}
 .icon-btn:active{background:var(--border)}
-.icon-btn.delete:hover .ph{color:var(--red)}
-.icon-btn.edit:hover .ph{color:var(--accent)}
+.icon-btn.delete:active .ph{color:var(--red)}
+.icon-btn.edit:active .ph{color:var(--accent)}
 
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);width:100%}
 .empty-state .ph{font-size:48px;display:block;margin-bottom:12px;color:var(--border)}
 .empty-state p{font-size:15px}
 
@@ -165,24 +169,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .weekly-task-row:last-child{border-bottom:none}
 .weekly-task-row .task-label{flex:1;font-size:14px;line-height:1.3}
 .weekly-task-row .area-badge{font-size:11px;color:var(--muted);white-space:nowrap}
-.w-num{font-size:13px;color:var(--muted);min-width:20px;text-align:center}
 
 /* ─── Bottom nav ──────────────────────────────────────────────────────────── */
 .bottom-nav{background:var(--surface);border-top:1px solid var(--border);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
-.bottom-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:500;min-height:60px;transition:color .15s;-webkit-tap-highlight-color:transparent;position:relative}
+.bottom-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:500;min-height:60px;transition:color .15s;-webkit-tap-highlight-color:transparent}
 .bottom-nav-btn .ph{font-size:24px;transition:color .15s}
 .bottom-nav-btn.active{color:var(--accent)}
 .bottom-nav-btn.active .ph{color:var(--accent)}
 .bottom-nav-btn:active{opacity:.7}
-.add-fab{background:var(--accent);border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;margin-bottom:2px;box-shadow:0 4px 16px rgba(139,127,255,.4)}
-.add-fab .ph{font-size:24px;color:#fff}
+
+/* ─── Toast ───────────────────────────────────────────────────────────────── */
+#toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--surface3);border:1px solid var(--border);border-radius:20px;padding:10px 20px;font-size:14px;font-weight:500;color:var(--text);z-index:400;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px var(--shadow)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ─── Modals ──────────────────────────────────────────────────────────────── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(3px)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(3px)}
 .modal-overlay.open{display:flex}
 .modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:92dvh;overflow:hidden;display:flex;flex-direction:column}
-.modal-header{padding:20px 20px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--border)}
-.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px;flex-shrink:0}
+.modal-handle-wrap{padding:12px 20px 0;flex-shrink:0}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto}
+.modal-header{padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--border)}
 .modal-title{font-size:17px;font-weight:700;letter-spacing:-.2px}
 .modal-close{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .modal-close .ph{font-size:16px}
@@ -196,15 +202,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
 .form-select option{background:var(--surface2)}
 .form-textarea{resize:vertical;min-height:80px;line-height:1.5}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
 .btn{padding:15px;border-radius:12px;border:none;cursor:pointer;font-size:15px;font-weight:600;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:active{background:#7266e8}
+.btn-primary:active{background:#0090C8}
 .btn-ghost{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
 .btn-ghost:active{background:var(--border)}
 .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,59,48,.3)}
 .btn-danger:active{opacity:.8}
+
+/* ─── Theme picker ────────────────────────────────────────────────────────── */
+.theme-picker{display:flex;gap:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:4px;overflow:hidden}
+.theme-opt{flex:1;padding:9px 4px;border-radius:9px;border:none;background:transparent;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.theme-opt .ph{font-size:15px}
+.theme-opt.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px var(--shadow)}
+
+/* ─── Areas bottom sheet ─────────────────────────────────────────────────── */
+.areas-sheet-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:10px 4px 4px}
+.areas-sheet-item{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:12px;cursor:pointer;font-size:15px;color:var(--muted);min-height:var(--tap);transition:all .12s}
+.areas-sheet-item .ph{font-size:22px;flex-shrink:0}
+.areas-sheet-item:active{background:var(--surface2)}
+.areas-sheet-item.active{background:var(--accent-dim);color:var(--accent)}
+.areas-sheet-item.active .ph{color:var(--accent)}
+.areas-sheet-item-text{flex:1;font-weight:500}
+.areas-sheet-count{font-size:12px;background:var(--surface2);border-radius:10px;padding:2px 8px;color:var(--muted)}
+.areas-sheet-item.active .areas-sheet-count{background:var(--accent);color:#fff}
+.areas-divider{height:1px;background:var(--border);margin:4px 0}
 
 /* ─── Blocked-by picker ───────────────────────────────────────────────────── */
 .blocked-picker-search{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:10px}
@@ -222,8 +245,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .picker-checkbox .ph{font-size:13px;color:#fff}
 .picker-task-title{font-size:14px;flex:1;line-height:1.3}
 .picker-task-area{font-size:11px;color:var(--muted)}
-
-/* ─── Blocked-by display field ────────────────────────────────────────────── */
 .blocked-field{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;min-height:52px;transition:border-color .15s}
 .blocked-field:active{border-color:var(--accent)}
 .blocked-field .ph{font-size:18px;color:var(--muted);flex-shrink:0}
@@ -234,18 +255,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── Settings ────────────────────────────────────────────────────────────── */
 .settings-area-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
-.settings-area-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center}
+.settings-area-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;color:var(--muted)}
 .settings-area-input{flex:1;background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit}
 .settings-area-del{width:36px;height:36px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);border-radius:8px;flex-shrink:0}
 .settings-area-del:active{background:var(--red-dim)}
 .settings-area-del .ph{font-size:20px}
 .settings-area-del:active .ph{color:var(--red)}
+.settings-add-area{display:flex;align-items:center;gap:10px;padding:14px 12px;border-radius:12px;border:1px dashed var(--border);cursor:pointer;color:var(--accent);font-size:14px;font-weight:500;width:100%;background:transparent;transition:background .15s;margin-bottom:8px}
+.settings-add-area:active{background:var(--accent-dim)}
+.settings-add-area .ph{font-size:20px}
 .settings-divider{height:1px;background:var(--border);margin:16px 0}
 .settings-signout{display:flex;align-items:center;gap:10px;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--red);font-size:15px;font-weight:500;width:100%;justify-content:center}
 .settings-signout .ph{font-size:20px}
 .settings-signout:active{opacity:.7}
 
-/* ─── Delete area migration modal ─────────────────────────────────────────── */
+/* ─── Delete area modal ────────────────────────────────────────────────────── */
 .migrate-warning{display:flex;gap:10px;padding:14px;background:var(--red-dim);border-radius:12px;border:1px solid rgba(255,59,48,.25);font-size:14px;line-height:1.5;color:#FF8A85}
 .migrate-warning .ph{font-size:20px;flex-shrink:0;margin-top:1px}
 
@@ -256,12 +280,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 
+<div id="toast"></div>
+
 <!-- ── Sign-in ── -->
 <div id="signin-screen">
   <div class="signin-logo">🗂️</div>
   <div>
     <div class="signin-title">Life HQ</div>
-    <div class="signin-sub" style="margin-top:8px">Your personal command centre. Sign in to sync across all devices.</div>
+    <div class="signin-sub">Your personal command centre. Sign in to sync across all devices.</div>
   </div>
   <button class="signin-btn" onclick="signIn()">
     <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -272,106 +298,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ── App ── -->
 <div id="app">
 
-  <!-- Header row 1: logo + search -->
+  <!-- Header -->
   <div class="header">
     <div class="header-row1">
-      <div class="header-logo">
-        <i class="ph-duotone ph-squares-four header-logo .ph" style="font-size:22px;color:var(--accent)"></i>
+      <div class="header-logo" onclick="openSettings()">
+        <i class="ph-duotone ph-squares-four header-logo-icon"></i>
         <span class="header-title">Life HQ</span>
       </div>
-      <div class="header-search" style="flex:1;margin-left:12px">
+      <div class="header-search">
         <i class="ph-duotone ph-magnifying-glass ph"></i>
         <input type="text" placeholder="Search tasks…" oninput="searchTasks(this.value)" id="search-input"/>
-        <span class="sync-dot" id="sync-dot"></span>
       </div>
-    </div>
-    <!-- Urgency filter row -->
-    <div class="filter-row">
-      <span class="filter-row-label">Urgency</span>
-      <button class="chip active" onclick="toggleFilter('urgency','all')" id="f-urgency-all">All</button>
-      <button class="chip" onclick="toggleFilter('urgency','high')" id="f-urgency-high"><i class="ph-duotone ph-warning"></i>High</button>
-      <button class="chip" onclick="toggleFilter('urgency','med')" id="f-urgency-med"><i class="ph-duotone ph-minus-circle"></i>Med</button>
-      <button class="chip" onclick="toggleFilter('urgency','low')" id="f-urgency-low"><i class="ph-duotone ph-arrow-down"></i>Low</button>
-    </div>
-    <!-- Effort filter row -->
-    <div class="filter-row">
-      <span class="filter-row-label">Effort</span>
-      <button class="chip active" onclick="toggleFilter('effort','all')" id="f-effort-all">All</button>
-      <button class="chip" onclick="toggleFilter('effort','low')" id="f-effort-low"><i class="ph-duotone ph-feather"></i>Low</button>
-      <button class="chip" onclick="toggleFilter('effort','medium')" id="f-effort-medium"><i class="ph-duotone ph-equals"></i>Medium</button>
-      <button class="chip" onclick="toggleFilter('effort','high')" id="f-effort-high"><i class="ph-duotone ph-trend-up"></i>High</button>
-      <button class="chip" onclick="toggleFilter('effort','huge')" id="f-effort-huge"><i class="ph-duotone ph-mountains"></i>Huge</button>
     </div>
   </div>
 
-  <!-- Stats grid — tappable, full-width -->
-  <div class="stats-grid" id="stats-grid">
-    <div class="stat-card" onclick="statFilter('active')" id="stat-card-active">
-      <div class="stat-num" id="stat-total" style="color:var(--accent)">0</div>
-      <div class="stat-label">Active</div>
+  <!-- Tabs: Active / Due Soon / Overdue / Done -->
+  <div class="tabs" id="tabs">
+    <div class="tab active" onclick="setTab('active')" id="tab-active">
+      <div class="tab-count" id="tcount-active">0</div>
+      <div class="tab-label">Active</div>
     </div>
-    <div class="stat-card" onclick="statFilter('high')" id="stat-card-high">
-      <div class="stat-num" id="stat-urgent" style="color:var(--red)">0</div>
-      <div class="stat-label">🔴 High</div>
+    <div class="tab" onclick="setTab('due-soon')" id="tab-due-soon">
+      <div class="tab-count" id="tcount-due-soon">0</div>
+      <div class="tab-label">Due Soon</div>
     </div>
-    <div class="stat-card" onclick="statFilter('due-soon')" id="stat-card-due-soon">
-      <div class="stat-num" id="stat-duesoon" style="color:var(--orange)">0</div>
-      <div class="stat-label">Due Soon</div>
+    <div class="tab" onclick="setTab('overdue')" id="tab-overdue">
+      <div class="tab-count" id="tcount-overdue">0</div>
+      <div class="tab-label">Overdue</div>
     </div>
-    <div class="stat-card" onclick="statFilter('overdue')" id="stat-card-overdue">
-      <div class="stat-num" id="stat-overdue" style="color:var(--red)">0</div>
-      <div class="stat-label">Overdue</div>
-    </div>
-    <div class="stat-card" onclick="statFilter('done')" id="stat-card-done">
-      <div class="stat-num" id="stat-done" style="color:var(--green)">0</div>
-      <div class="stat-label">Done</div>
+    <div class="tab" onclick="setTab('done')" id="tab-done">
+      <div class="tab-count" id="tcount-done">0</div>
+      <div class="tab-label">Done</div>
     </div>
   </div>
 
   <div class="main">
-    <!-- Sidebar overlay -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
-
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-inner">
-        <div class="sidebar-section">
-          <div class="sidebar-label">Views</div>
-          <div class="nav-item active" onclick="filterArea('all');closeSidebar()" id="nav-all">
-            <i class="ph-duotone ph-list-checks ph"></i>
-            <span class="nav-item-text">All Tasks</span>
-            <span class="nav-count" id="count-all">0</span>
-          </div>
-          <div class="nav-item" onclick="filterArea('overdue');closeSidebar()" id="nav-overdue">
-            <i class="ph-duotone ph-warning-circle ph"></i>
-            <span class="nav-item-text">Overdue</span>
-            <span class="nav-count" id="count-overdue">0</span>
-          </div>
-          <div class="nav-item" onclick="filterArea('due-soon');closeSidebar()" id="nav-due-soon">
-            <i class="ph-duotone ph-fire ph"></i>
-            <span class="nav-item-text">Due Soon</span>
-            <span class="nav-count" id="count-due-soon">0</span>
-          </div>
-        </div>
-        <div class="sidebar-section">
-          <div class="sidebar-label">Areas</div>
-          <div id="sidebar-areas"></div>
-        </div>
-        <div class="sidebar-section">
-          <div class="sidebar-label">Status</div>
-          <div class="nav-item" onclick="filterStatus('active');closeSidebar()" id="nav-active">
-            <i class="ph-duotone ph-lightning ph"></i>
-            <span class="nav-item-text">Active</span>
-          </div>
-          <div class="nav-item" onclick="filterStatus('done');closeSidebar()" id="nav-done">
-            <i class="ph-duotone ph-check-circle ph"></i>
-            <span class="nav-item-text">Completed</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Content -->
     <div class="content">
       <div class="task-list" id="task-list"></div>
       <div class="weekly-view" id="weekly-view"></div>
@@ -380,7 +341,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   <!-- Bottom nav -->
   <div class="bottom-nav">
-    <button class="bottom-nav-btn" onclick="toggleSidebar()" id="bnav-areas">
+    <button class="bottom-nav-btn" onclick="openAreasSheet()" id="bnav-areas">
       <i class="ph-duotone ph-squares-four ph"></i>
       <span>Areas</span>
     </button>
@@ -393,16 +354,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <span>Weekly</span>
     </button>
     <button class="bottom-nav-btn" onclick="openAddModal()" id="bnav-add">
-      <div class="add-fab"><i class="ph-duotone ph-plus ph"></i></div>
+      <i class="ph-duotone ph-plus ph"></i>
       <span>Add</span>
     </button>
+  </div>
+</div>
+
+<!-- ── Areas Bottom Sheet ── -->
+<div class="modal-overlay" id="areas-modal">
+  <div class="modal" style="max-height:80dvh">
+    <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
+    <div class="modal-body" style="padding-top:8px;gap:0" id="areas-sheet-body"></div>
   </div>
 </div>
 
 <!-- ── Task Modal ── -->
 <div class="modal-overlay" id="task-modal">
   <div class="modal">
-    <div style="padding:12px 20px 0;flex-shrink:0"><div class="modal-handle"></div></div>
+    <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
     <div class="modal-header">
       <div class="modal-title" id="modal-title">Add Task</div>
       <button class="modal-close" onclick="closeModal()"><i class="ph-duotone ph-x"></i></button>
@@ -413,28 +382,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <label class="form-label">Title</label>
         <input type="text" class="form-input" id="f-title" placeholder="What needs to be done?"/>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Area</label>
-          <select class="form-select" id="f-area"></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Urgency</label>
-          <select class="form-select" id="f-urgency">
-            <option value="high">🔴 High</option>
-            <option value="med" selected>🟡 Medium</option>
-            <option value="low">🟢 Low</option>
-          </select>
-        </div>
-      </div>
       <div class="form-group">
-        <label class="form-label">Effort</label>
-        <select class="form-select" id="f-effort">
-          <option value="low">Feather — Low (30 min)</option>
-          <option value="medium" selected>= — Medium (a few hours)</option>
-          <option value="high">↑ — High (full day)</option>
-          <option value="huge">⛰ — Huge (multi-day)</option>
-        </select>
+        <label class="form-label">Area</label>
+        <select class="form-select" id="f-area"></select>
       </div>
       <div class="form-group">
         <label class="form-label">Deadline</label>
@@ -467,7 +417,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ── Blocked-by Picker Modal ── -->
 <div class="modal-overlay" id="blocked-modal">
   <div class="modal">
-    <div style="padding:12px 20px 0;flex-shrink:0"><div class="modal-handle"></div></div>
+    <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
     <div class="modal-header">
       <div class="modal-title">Blocked By</div>
       <button class="modal-close" onclick="closeBlockedPicker()"><i class="ph-duotone ph-x"></i></button>
@@ -490,14 +440,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ── Settings Modal ── -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal">
-    <div style="padding:12px 20px 0;flex-shrink:0"><div class="modal-handle"></div></div>
+    <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
     <div class="modal-header">
       <div class="modal-title">Settings</div>
       <button class="modal-close" onclick="closeSettings()"><i class="ph-duotone ph-x"></i></button>
     </div>
     <div class="modal-body">
+      <!-- Theme -->
+      <div class="form-group">
+        <label class="form-label">Appearance</label>
+        <div class="theme-picker">
+          <button class="theme-opt" onclick="setTheme('light')" id="theme-light"><i class="ph-duotone ph-sun ph"></i>Light</button>
+          <button class="theme-opt" onclick="setTheme('auto')"  id="theme-auto"><i class="ph-duotone ph-devices ph"></i>Auto</button>
+          <button class="theme-opt" onclick="setTheme('dark')"  id="theme-dark"><i class="ph-duotone ph-moon ph"></i>Dark</button>
+        </div>
+      </div>
+      <div class="settings-divider" style="margin:6px 0"></div>
+      <!-- Areas -->
       <div class="form-label" style="margin-bottom:8px">Areas</div>
       <div id="settings-areas-list"></div>
+      <button class="settings-add-area" onclick="addNewArea()">
+        <i class="ph-duotone ph-plus-circle ph"></i>
+        Add Area
+      </button>
       <div class="settings-divider"></div>
       <button class="settings-signout" onclick="signOut()">
         <i class="ph-duotone ph-sign-out"></i>
@@ -514,7 +479,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ── Delete Area Modal ── -->
 <div class="modal-overlay" id="delete-area-modal">
   <div class="modal">
-    <div style="padding:12px 20px 0;flex-shrink:0"><div class="modal-handle"></div></div>
+    <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
     <div class="modal-header">
       <div class="modal-title" id="delete-area-title">Delete Area</div>
       <button class="modal-close" onclick="closeDeleteAreaModal()"><i class="ph-duotone ph-x"></i></button>
@@ -522,7 +487,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="modal-body">
       <div class="migrate-warning">
         <i class="ph-duotone ph-warning ph"></i>
-        <div id="delete-area-warning">This area has tasks. Choose where to move them before deleting.</div>
+        <div id="delete-area-warning">This area has tasks. Choose where to move them.</div>
       </div>
       <div class="form-group" id="migrate-select-wrap">
         <label class="form-label">Move tasks to</label>
@@ -539,196 +504,219 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 // ─── Constants ────────────────────────────────────────────────────────────────
 const AREAS_DEFAULT = {
-  house:       {icon:'ph-house',       label:'House'},
-  job:         {icon:'ph-airplane',    label:'Priceline'},
-  personal:    {icon:'ph-user',        label:'Personal'},
-  sidehustle1: {icon:'ph-game-controller', label:'Fun Projects'},
+  house:       {icon:'ph-house',             label:'House'},
+  job:         {icon:'ph-airplane',          label:'Priceline'},
+  personal:    {icon:'ph-user',              label:'Personal'},
+  sidehustle1: {icon:'ph-game-controller',   label:'Fun Projects'},
   sidehustle2: {icon:'ph-television-simple', label:'Watch List'},
-  biz1:        {icon:'ph-buildings',   label:'GLK'},
-  biz2:        {icon:'ph-cards',       label:'Play Years'},
+  biz1:        {icon:'ph-buildings',         label:'GLK'},
+  biz2:        {icon:'ph-cards',             label:'Play Years'},
 };
-
-const EFFORTS = {
-  low:    {label:'Low',    cls:'tag-effort-low'},
-  medium: {label:'Medium', cls:'tag-effort-medium'},
-  high:   {label:'High',   cls:'tag-effort-high'},
-  huge:   {label:'Huge',   cls:'tag-effort-huge'},
-};
-
-const URGENCIES = {
-  high: {label:'High', cls:'tag-urgency-high'},
-  med:  {label:'Med',  cls:'tag-urgency-med'},
-  low:  {label:'Low',  cls:'tag-urgency-low'},
-};
-
-// Migrate old effort values
-function migrateEffort(e) {
-  return {quick:'low', halfday:'medium', project:'high'}[e] || e || 'low';
-}
 
 // ─── Seed data ────────────────────────────────────────────────────────────────
 const SEED_TASKS = [
-  {id:'s1',  done:false,area:'biz1',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'Take me off payroll',notes:'Chris action item'},
-  {id:'s2',  done:false,area:'biz1',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'HST Remit',notes:'Financial deadline'},
-  {id:'s3',  done:false,area:'biz1',urgency:'high',effort:'medium',  deadline:'',blocked:'',title:'GLK taxes',notes:''},
-  {id:'s4',  done:false,area:'biz1',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'GitHub backups',notes:''},
-  {id:'s5',  done:false,area:'biz1',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'Justin — write + invoice',notes:''},
-  {id:'s6',  done:false,area:'biz1',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'Ed invoices',notes:'May be completed — verify'},
-  {id:'s7',  done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Nik — email',notes:''},
-  {id:'s8',  done:false,area:'biz1',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'Tang — work + invoice',notes:''},
-  {id:'s9',  done:false,area:'biz1',urgency:'high',effort:'medium',  deadline:'',blocked:'',title:'HYP — finish + invoice',notes:''},
-  {id:'s10', done:false,area:'biz1',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'Invoice Suzy',notes:'Circled on May 25 list'},
-  {id:'s11', done:false,area:'biz1',urgency:'high',effort:'medium',  deadline:'',blocked:'',title:'AM DS — password protect w/ encrypt',notes:'Security item'},
-  {id:'s12', done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'LT.com — add 3D nuclear + article',notes:''},
-  {id:'s13', done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Medium article — add screenshot + course',notes:''},
-  {id:'s14', done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Update Git w/ LT.com',notes:''},
-  {id:'s15', done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Astro — game of welcome + responsive',notes:''},
-  {id:'s16', done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Prep for interview — showcase AM or Astro',notes:''},
-  {id:'s17', done:false,area:'biz1',urgency:'med', effort:'high',    deadline:'',blocked:'',title:'Judy.com — client website',notes:''},
-  {id:'s18', done:false,area:'biz1',urgency:'med', effort:'high',    deadline:'',blocked:'',title:'Travis Hopkins.com — client website',notes:''},
-  {id:'s19', done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Krandar — check warped / new book / Faire',notes:''},
-  {id:'s20', done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Close BMO account',notes:''},
-  {id:'s21', done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'BMO ESOP — where?',notes:''},
-  {id:'s22', done:false,area:'biz1',urgency:'med', effort:'huge',    deadline:'',blocked:'',title:'LEAP website project',notes:'With GLK'},
-  {id:'s23', done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Design golf cart decal — Chris print',notes:''},
-  {id:'s24', done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Jari story about Alex',notes:'Follow up with Chris'},
-  {id:'s111',done:false,area:'biz1',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'FanExpo — did we get the booth?',notes:''},
-  {id:'s112',done:false,area:'biz1',urgency:'high',effort:'medium',  deadline:'',blocked:'',title:'Holiday Films — finish + invoice',notes:''},
-  {id:'s113',done:false,area:'biz1',urgency:'med', effort:'huge',    deadline:'',blocked:'',title:'Redwheels — home page + layouts + responsive',notes:''},
-  {id:'s114',done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Pineapple — fix Pardot + Facebook tracking',notes:''},
-  {id:'s115',done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Community One — rebuild quote + fix carousels',notes:''},
-  {id:'s116',done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Ryan Bone — email / build?',notes:''},
-  {id:'s117',done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'WATC — popup',notes:''},
-  {id:'s118',done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'YACC — make list of overtures',notes:''},
-  {id:'s119',done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Quote Andrew Carasco + send references',notes:''},
-  {id:'s120',done:false,area:'biz1',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Arts at Work — setup dev + invoice',notes:''},
-  {id:'s121',done:false,area:'biz1',urgency:'med', effort:'huge',    deadline:'',blocked:'',title:'Astro Squad — case study + proposal for CMF',notes:''},
-  {id:'s122',done:false,area:'biz1',urgency:'med', effort:'huge',    deadline:'',blocked:'',title:'Astro Squad — trademark name + logo',notes:''},
-  {id:'s123',done:false,area:'biz1',urgency:'low', effort:'huge',    deadline:'',blocked:'',title:'Astro Squad — create characters',notes:''},
-  {id:'s124',done:false,area:'biz1',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Astro Squad — copyright',notes:''},
-  {id:'s25', done:false,area:'biz2',urgency:'high',effort:'low',     deadline:'',blocked:'',title:'Take photo of card for Denoja',notes:''},
-  {id:'s26', done:false,area:'biz2',urgency:'high',effort:'huge',    deadline:'',blocked:'',title:'Make all cards',notes:'Core production task'},
-  {id:'s27', done:false,area:'biz2',urgency:'high',effort:'medium',  deadline:'',blocked:'',title:'Cover card + legend',notes:''},
-  {id:'s28', done:false,area:'biz2',urgency:'med', effort:'medium',  deadline:'',blocked:'Make all cards',title:'Add hole + indicator to cards',notes:''},
-  {id:'s29', done:false,area:'biz2',urgency:'med', effort:'low',     deadline:'',blocked:'Cover card + legend',title:'Test print card @ Staples',notes:''},
-  {id:'s30', done:false,area:'biz2',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Box sticker — Made in Canada',notes:''},
-  {id:'s31', done:false,area:'biz2',urgency:'med', effort:'huge',    deadline:'',blocked:'',title:'Play Years website design',notes:''},
-  {id:'s32', done:false,area:'biz2',urgency:'high',effort:'low',     deadline:'',blocked:'Make all cards',title:'Send Play Years cards to Amazon',notes:''},
-  {id:'s33', done:false,area:'biz2',urgency:'high',effort:'medium',  deadline:'',blocked:'Send Play Years cards to Amazon',title:'Launch on Amazon',notes:''},
-  {id:'s34', done:false,area:'biz2',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Faire marketplace listing',notes:''},
-  {id:'s35', done:false,area:'biz2',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Email contact list',notes:''},
-  {id:'s36', done:false,area:'biz2',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Instagram post + boost',notes:''},
-  {id:'s37', done:false,area:'biz2',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Drop off giveaway',notes:''},
-  {id:'s38', done:false,area:'biz2',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Wholesale price sheet',notes:''},
-  {id:'s39', done:false,area:'biz2',urgency:'med', effort:'medium',  deadline:'',blocked:'',title:'Play Years marketing plan',notes:''},
-  {id:'s40', done:false,area:'biz2',urgency:'med', effort:'low',     deadline:'',blocked:'',title:'Buy shrink wrap + plastic loops',notes:''},
-  {id:'s41', done:false,area:'job', urgency:'high',effort:'low',     deadline:'',blocked:'',title:'Book off Nov 16 + February Mexico',notes:'Through Priceline time-off system'},
-  {id:'s42', done:false,area:'job', urgency:'high',effort:'low',     deadline:'',blocked:'',title:'Follow up w/ Wes — vacation request',notes:''},
-  {id:'s43', done:false,area:'job', urgency:'med', effort:'low',     deadline:'',blocked:'',title:'COMP — postpone pros',notes:''},
-  {id:'s44', done:false,area:'personal',urgency:'high',effort:'low', deadline:'2026-08-01',blocked:'',title:'Arrange babysitter for Nara — Aug 7',notes:'Check if mom can watch Nara'},
-  {id:'s45', done:false,area:'personal',urgency:'high',effort:'low', deadline:'2026-07-25',blocked:'',title:'Confirm mom to watch Nara on Aug 7',notes:''},
-  {id:'s46', done:false,area:'personal',urgency:'med', effort:'low', deadline:'',blocked:'',title:'Lance gift',notes:'$45 budget'},
-  {id:'s47', done:false,area:'personal',urgency:'med', effort:'medium',deadline:'',blocked:'',title:'KMM — fix tire + tuneup',notes:''},
-  {id:'s48', done:false,area:'personal',urgency:'low', effort:'medium',deadline:'',blocked:'',title:'Clean motorcycle',notes:''},
-  {id:'s49', done:false,area:'personal',urgency:'low', effort:'low', deadline:'',blocked:'Clean motorcycle',title:'Degrease chain + oil',notes:''},
-  {id:'s50', done:false,area:'house',urgency:'high',effort:'medium', deadline:'',blocked:'',title:'Fix hot tub wire',notes:'Safety — do first'},
-  {id:'s51', done:false,area:'house',urgency:'high',effort:'low',    deadline:'',blocked:'',title:'Replace furnace filter',notes:''},
-  {id:'s52', done:false,area:'house',urgency:'med', effort:'medium', deadline:'',blocked:'',title:'Replace outlet in driveway',notes:''},
-  {id:'s53', done:false,area:'house',urgency:'med', effort:'medium', deadline:'',blocked:'',title:'Fix outlet in basement closet — wire in rafter',notes:''},
-  {id:'s54', done:false,area:'house',urgency:'med', effort:'medium', deadline:'',blocked:'',title:'Fix basement wire',notes:''},
-  {id:'s55', done:false,area:'house',urgency:'med', effort:'medium', deadline:'',blocked:'',title:'Fix side steps',notes:''},
-  {id:'s56', done:false,area:'house',urgency:'med', effort:'huge',   deadline:'',blocked:'',title:'Electrical to shed',notes:''},
-  {id:'s57', done:false,area:'house',urgency:'med', effort:'medium', deadline:'',blocked:'',title:'Fix split siding over door',notes:''},
-  {id:'s58', done:false,area:'house',urgency:'med', effort:'low',    deadline:'',blocked:'',title:'New electrical panel map',notes:''},
-  {id:'s59', done:false,area:'house',urgency:'med', effort:'low',    deadline:'',blocked:'New electrical panel map',title:'Label breakers',notes:''},
-  {id:'s60', done:false,area:'house',urgency:'med', effort:'low',    deadline:'',blocked:'',title:'City water shut off — know location',notes:''},
-  {id:'s61', done:false,area:'house',urgency:'med', effort:'huge',   deadline:'',blocked:'',title:'Shower wall glass',notes:''},
-  {id:'s62', done:false,area:'house',urgency:'med', effort:'low',    deadline:'',blocked:'',title:"Buy 8' PVC",notes:''},
-  {id:'s63', done:false,area:'house',urgency:'med', effort:'low',    deadline:'',blocked:'',title:'Buy PVC cement',notes:''},
-  {id:'s64', done:false,area:'house',urgency:'med', effort:'low',    deadline:'',blocked:'',title:'Buy white silicone',notes:''},
-  {id:'s65', done:false,area:'house',urgency:'med', effort:'medium', deadline:'',blocked:"Buy 8' PVC; PVC cement; white silicone",title:'Make BBQ access to trap',notes:''},
-  {id:'s66', done:false,area:'house',urgency:'low', effort:'medium', deadline:'',blocked:'',title:'Fan in attic window',notes:''},
-  {id:'s67', done:false,area:'house',urgency:'low', effort:'medium', deadline:'',blocked:'',title:'Organize tool boxes',notes:''},
-  {id:'s68', done:false,area:'house',urgency:'low', effort:'low',    deadline:'',blocked:'',title:'Touch up blue paint',notes:''},
-  {id:'s69', done:false,area:'house',urgency:'low', effort:'low',    deadline:'',blocked:'',title:'Mount TP holder',notes:''},
-  {id:'s70', done:false,area:'house',urgency:'low', effort:'low',    deadline:'',blocked:'',title:'New kitchen drawer tabs',notes:''},
-  {id:'s71', done:false,area:'house',urgency:'low', effort:'low',    deadline:'',blocked:'',title:'Fix butterfly frames',notes:''},
-  {id:'s72', done:false,area:'house',urgency:'low', effort:'medium', deadline:'',blocked:'',title:'Clean basement',notes:''},
-  {id:'s73', done:false,area:'house',urgency:'low', effort:'medium', deadline:'',blocked:'',title:'Hallway art',notes:''},
-  {id:'s74', done:false,area:'house',urgency:'low', effort:'medium', deadline:'',blocked:'',title:'Hot tub table / side table',notes:''},
-  {id:'s75', done:false,area:'house',urgency:'low', effort:'medium', deadline:'',blocked:'',title:'Hot tub stand',notes:''},
-  {id:'s76', done:false,area:'house',urgency:'low', effort:'huge',   deadline:'',blocked:'',title:'Backyard TV',notes:''},
-  {id:'s77', done:false,area:'house',urgency:'med', effort:'low',    deadline:'',blocked:'',title:'Water shut off — know location',notes:''},
-  {id:'s78', done:false,area:'sidehustle1',urgency:'med',effort:'low',   deadline:'',blocked:'',title:'Fix Oculus',notes:''},
-  {id:'s79', done:false,area:'sidehustle1',urgency:'med',effort:'low',   deadline:'',blocked:'',title:'Pre-order GTA6',notes:''},
-  {id:'s80', done:false,area:'sidehustle1',urgency:'low',effort:'medium',deadline:'',blocked:'',title:'Shell bracelet',notes:''},
-  {id:'s81', done:false,area:'sidehustle1',urgency:'low',effort:'huge',  deadline:'',blocked:'',title:'Outdoor stained glass art — design + build',notes:''},
-  {id:'s82', done:false,area:'sidehustle1',urgency:'low',effort:'huge',  deadline:'',blocked:'',title:'Army helmet lamp — buy helmet, order parts, build',notes:''},
-  {id:'s83', done:false,area:'sidehustle1',urgency:'low',effort:'huge',  deadline:'',blocked:'',title:'Build Arduino lightbulb project',notes:''},
-  {id:'s84', done:false,area:'sidehustle1',urgency:'low',effort:'huge',  deadline:'',blocked:'',title:'Wood glass thing',notes:''},
-  {id:'s85', done:false,area:'sidehustle1',urgency:'low',effort:'low',   deadline:'',blocked:'',title:'Play Starfox',notes:''},
-  {id:'s86', done:false,area:'sidehustle1',urgency:'low',effort:'medium',deadline:'',blocked:'',title:'Pass Ghost of Yotel',notes:''},
-  {id:'s240',done:false,area:'sidehustle1',urgency:'low',effort:'medium',deadline:'',blocked:'',title:'Play: Zelda — A Link to the Past',notes:''},
-  {id:'s241',done:false,area:'sidehustle1',urgency:'low',effort:'medium',deadline:'',blocked:'',title:"Play: Zelda — Link's Awakening",notes:''},
-  {id:'s242',done:false,area:'sidehustle1',urgency:'low',effort:'medium',deadline:'',blocked:'',title:'Play: Super Mario World',notes:''},
-  {id:'s243',done:false,area:'sidehustle1',urgency:'low',effort:'medium',deadline:'',blocked:'',title:'Play: Megaman',notes:''},
-  {id:'s87', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Squid Game 3',notes:''},
-  {id:'s88', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: The Assessment',notes:''},
-  {id:'s89', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Frankenstein',notes:''},
-  {id:'s90', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Black Phone 1 & 2',notes:''},
-  {id:'s91', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Good Boy',notes:''},
-  {id:'s92', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Minecraft Movie',notes:''},
-  {id:'s93', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Avatar',notes:''},
-  {id:'s94', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Men in Black',notes:''},
-  {id:'s95', done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Jungle Cruise',notes:''},
-  {id:'s200',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Land Before Time',notes:''},
-  {id:'s201',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: All Dogs Go to Heaven',notes:''},
-  {id:'s202',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Blank Cheque',notes:''},
-  {id:'s203',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Short Circuit',notes:''},
-  {id:'s204',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Jurassic Park',notes:''},
-  {id:'s205',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: John Carter',notes:''},
-  {id:'s206',done:false,area:'sidehustle2',urgency:'low',effort:'high',deadline:'',blocked:'',title:'Watch: Star Wars Trilogy',notes:'3 films'},
-  {id:'s207',done:false,area:'sidehustle2',urgency:'low',effort:'huge',deadline:'',blocked:'',title:'Watch: All Ghibli Films',notes:''},
-  {id:'s208',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Adventures in Babysitting',notes:''},
-  {id:'s209',done:false,area:'sidehustle2',urgency:'low',effort:'high',deadline:'',blocked:'',title:'Watch: Indiana Jones (series)',notes:''},
-  {id:'s210',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Sahara',notes:''},
-  {id:'s211',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: National Treasure',notes:''},
-  {id:'s212',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Stargate',notes:''},
-  {id:'s213',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Labyrinth',notes:''},
-  {id:'s214',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Dark Crystal',notes:''},
-  {id:'s215',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Honey I Shrunk the Kids',notes:''},
-  {id:'s216',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Lilo and Stitch',notes:''},
-  {id:'s217',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: The Mummy',notes:''},
-  {id:'s218',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Mystery Men',notes:''},
-  {id:'s219',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Mannequin',notes:''},
-  {id:'s220',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Addicted to Love',notes:''},
-  {id:'s221',done:false,area:'sidehustle2',urgency:'low',effort:'high',deadline:'',blocked:'',title:'Watch: Star Trek remixes',notes:''},
-  {id:'s222',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Galaxy Quest',notes:''},
-  {id:'s223',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Alita: Battle Angel',notes:''},
-  {id:'s224',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: City of Ember',notes:''},
-  {id:'s225',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Jumanji',notes:''},
-  {id:'s226',done:false,area:'sidehustle2',urgency:'low',effort:'high',deadline:'',blocked:'',title:'Watch: Back to the Future (trilogy)',notes:''},
-  {id:'s227',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Uncharted',notes:''},
-  {id:'s228',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: The Big Hit',notes:''},
-  {id:'s229',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Pagemaster',notes:''},
-  {id:'s230',done:false,area:'sidehustle2',urgency:'low',effort:'low',deadline:'',blocked:'',title:'Watch: Secret of NiMH',notes:''},
-  {id:'s231',done:false,area:'sidehustle2',urgency:'low',effort:'huge',deadline:'',blocked:'',title:'Watch TV: Tailspin',notes:''},
-  {id:'s232',done:false,area:'sidehustle2',urgency:'low',effort:'huge',deadline:'',blocked:'',title:'Watch TV: Chip and Dale',notes:''},
-  {id:'s233',done:false,area:'sidehustle2',urgency:'low',effort:'huge',deadline:'',blocked:'',title:'Watch TV: Darkwing Duck',notes:''},
-  {id:'s234',done:false,area:'sidehustle2',urgency:'low',effort:'huge',deadline:'',blocked:'',title:'Watch TV: Gummy Bears',notes:''},
-  {id:'s235',done:false,area:'sidehustle2',urgency:'low',effort:'huge',deadline:'',blocked:'',title:'Watch TV: Farscape',notes:''},
-  {id:'s236',done:false,area:'sidehustle2',urgency:'low',effort:'huge',deadline:'',blocked:'',title:'Watch TV: Lost in Space',notes:''},
+  {id:'s1',  done:false,area:'biz1',deadline:'',blocked:'',title:'Take me off payroll',notes:'Chris action item'},
+  {id:'s2',  done:false,area:'biz1',deadline:'',blocked:'',title:'HST Remit',notes:'Financial deadline'},
+  {id:'s3',  done:false,area:'biz1',deadline:'',blocked:'',title:'GLK taxes',notes:''},
+  {id:'s4',  done:false,area:'biz1',deadline:'',blocked:'',title:'GitHub backups',notes:''},
+  {id:'s5',  done:false,area:'biz1',deadline:'',blocked:'',title:'Justin — write + invoice',notes:''},
+  {id:'s6',  done:false,area:'biz1',deadline:'',blocked:'',title:'Ed invoices',notes:'May be completed — verify'},
+  {id:'s7',  done:false,area:'biz1',deadline:'',blocked:'',title:'Nik — email',notes:''},
+  {id:'s8',  done:false,area:'biz1',deadline:'',blocked:'',title:'Tang — work + invoice',notes:''},
+  {id:'s9',  done:false,area:'biz1',deadline:'',blocked:'',title:'HYP — finish + invoice',notes:''},
+  {id:'s10', done:false,area:'biz1',deadline:'',blocked:'',title:'Invoice Suzy',notes:'Circled on May 25 list'},
+  {id:'s11', done:false,area:'biz1',deadline:'',blocked:'',title:'AM DS — password protect w/ encrypt',notes:'Security item'},
+  {id:'s12', done:false,area:'biz1',deadline:'',blocked:'',title:'LT.com — add 3D nuclear + article',notes:''},
+  {id:'s13', done:false,area:'biz1',deadline:'',blocked:'',title:'Medium article — add screenshot + course',notes:''},
+  {id:'s14', done:false,area:'biz1',deadline:'',blocked:'',title:'Update Git w/ LT.com',notes:''},
+  {id:'s15', done:false,area:'biz1',deadline:'',blocked:'',title:'Astro — game of welcome + responsive',notes:''},
+  {id:'s16', done:false,area:'biz1',deadline:'',blocked:'',title:'Prep for interview — showcase AM or Astro',notes:''},
+  {id:'s17', done:false,area:'biz1',deadline:'',blocked:'',title:'Judy.com — client website',notes:''},
+  {id:'s18', done:false,area:'biz1',deadline:'',blocked:'',title:'Travis Hopkins.com — client website',notes:''},
+  {id:'s19', done:false,area:'biz1',deadline:'',blocked:'',title:'Krandar — check warped / new book / Faire',notes:''},
+  {id:'s20', done:false,area:'biz1',deadline:'',blocked:'',title:'Close BMO account',notes:''},
+  {id:'s21', done:false,area:'biz1',deadline:'',blocked:'',title:'BMO ESOP — where?',notes:''},
+  {id:'s22', done:false,area:'biz1',deadline:'',blocked:'',title:'LEAP website project',notes:'With GLK'},
+  {id:'s23', done:false,area:'biz1',deadline:'',blocked:'',title:'Design golf cart decal — Chris print',notes:''},
+  {id:'s24', done:false,area:'biz1',deadline:'',blocked:'',title:'Jari story about Alex',notes:'Follow up with Chris'},
+  {id:'s111',done:false,area:'biz1',deadline:'',blocked:'',title:'FanExpo — did we get the booth?',notes:''},
+  {id:'s112',done:false,area:'biz1',deadline:'',blocked:'',title:'Holiday Films — finish + invoice',notes:''},
+  {id:'s113',done:false,area:'biz1',deadline:'',blocked:'',title:'Redwheels — home page + layouts + responsive',notes:''},
+  {id:'s114',done:false,area:'biz1',deadline:'',blocked:'',title:'Pineapple — fix Pardot + Facebook tracking',notes:''},
+  {id:'s115',done:false,area:'biz1',deadline:'',blocked:'',title:'Community One — rebuild quote + fix carousels',notes:''},
+  {id:'s116',done:false,area:'biz1',deadline:'',blocked:'',title:'Ryan Bone — email / build?',notes:''},
+  {id:'s117',done:false,area:'biz1',deadline:'',blocked:'',title:'WATC — popup',notes:''},
+  {id:'s118',done:false,area:'biz1',deadline:'',blocked:'',title:'YACC — make list of overtures',notes:''},
+  {id:'s119',done:false,area:'biz1',deadline:'',blocked:'',title:'Quote Andrew Carasco + send references',notes:''},
+  {id:'s120',done:false,area:'biz1',deadline:'',blocked:'',title:'Arts at Work — setup dev + invoice',notes:''},
+  {id:'s121',done:false,area:'biz1',deadline:'',blocked:'',title:'Astro Squad — case study + proposal for CMF',notes:''},
+  {id:'s122',done:false,area:'biz1',deadline:'',blocked:'',title:'Astro Squad — trademark name + logo',notes:''},
+  {id:'s123',done:false,area:'biz1',deadline:'',blocked:'',title:'Astro Squad — create characters',notes:''},
+  {id:'s124',done:false,area:'biz1',deadline:'',blocked:'',title:'Astro Squad — copyright',notes:''},
+  {id:'s25', done:false,area:'biz2',deadline:'',blocked:'',title:'Take photo of card for Denoja',notes:''},
+  {id:'s26', done:false,area:'biz2',deadline:'',blocked:'',title:'Make all cards',notes:'Core production task'},
+  {id:'s27', done:false,area:'biz2',deadline:'',blocked:'',title:'Cover card + legend',notes:''},
+  {id:'s28', done:false,area:'biz2',deadline:'',blocked:'Make all cards',title:'Add hole + indicator to cards',notes:''},
+  {id:'s29', done:false,area:'biz2',deadline:'',blocked:'Cover card + legend',title:'Test print card @ Staples',notes:''},
+  {id:'s30', done:false,area:'biz2',deadline:'',blocked:'',title:'Box sticker — Made in Canada',notes:''},
+  {id:'s31', done:false,area:'biz2',deadline:'',blocked:'',title:'Play Years website design',notes:''},
+  {id:'s32', done:false,area:'biz2',deadline:'',blocked:'Make all cards',title:'Send Play Years cards to Amazon',notes:''},
+  {id:'s33', done:false,area:'biz2',deadline:'',blocked:'Send Play Years cards to Amazon',title:'Launch on Amazon',notes:''},
+  {id:'s34', done:false,area:'biz2',deadline:'',blocked:'',title:'Faire marketplace listing',notes:''},
+  {id:'s35', done:false,area:'biz2',deadline:'',blocked:'',title:'Email contact list',notes:''},
+  {id:'s36', done:false,area:'biz2',deadline:'',blocked:'',title:'Instagram post + boost',notes:''},
+  {id:'s37', done:false,area:'biz2',deadline:'',blocked:'',title:'Drop off giveaway',notes:''},
+  {id:'s38', done:false,area:'biz2',deadline:'',blocked:'',title:'Wholesale price sheet',notes:''},
+  {id:'s39', done:false,area:'biz2',deadline:'',blocked:'',title:'Play Years marketing plan',notes:''},
+  {id:'s40', done:false,area:'biz2',deadline:'',blocked:'',title:'Buy shrink wrap + plastic loops',notes:''},
+  {id:'s41', done:false,area:'job', deadline:'',blocked:'',title:'Book off Nov 16 + February Mexico',notes:'Through Priceline time-off system'},
+  {id:'s42', done:false,area:'job', deadline:'',blocked:'',title:'Follow up w/ Wes — vacation request',notes:''},
+  {id:'s43', done:false,area:'job', deadline:'',blocked:'',title:'COMP — postpone pros',notes:''},
+  {id:'s44', done:false,area:'personal',deadline:'2026-08-01',blocked:'',title:'Arrange babysitter for Nara — Aug 7',notes:'Check if mom can watch Nara'},
+  {id:'s45', done:false,area:'personal',deadline:'2026-07-25',blocked:'',title:'Confirm mom to watch Nara on Aug 7',notes:''},
+  {id:'s46', done:false,area:'personal',deadline:'',blocked:'',title:'Lance gift',notes:'$45 budget'},
+  {id:'s47', done:false,area:'personal',deadline:'',blocked:'',title:'KMM — fix tire + tuneup',notes:''},
+  {id:'s48', done:false,area:'personal',deadline:'',blocked:'',title:'Clean motorcycle',notes:''},
+  {id:'s49', done:false,area:'personal',deadline:'',blocked:'Clean motorcycle',title:'Degrease chain + oil',notes:''},
+  {id:'s50', done:false,area:'house',deadline:'',blocked:'',title:'Fix hot tub wire',notes:'Safety — do first'},
+  {id:'s51', done:false,area:'house',deadline:'',blocked:'',title:'Replace furnace filter',notes:''},
+  {id:'s52', done:false,area:'house',deadline:'',blocked:'',title:'Replace outlet in driveway',notes:''},
+  {id:'s53', done:false,area:'house',deadline:'',blocked:'',title:'Fix outlet in basement closet — wire in rafter',notes:''},
+  {id:'s54', done:false,area:'house',deadline:'',blocked:'',title:'Fix basement wire',notes:''},
+  {id:'s55', done:false,area:'house',deadline:'',blocked:'',title:'Fix side steps',notes:''},
+  {id:'s56', done:false,area:'house',deadline:'',blocked:'',title:'Electrical to shed',notes:''},
+  {id:'s57', done:false,area:'house',deadline:'',blocked:'',title:'Fix split siding over door',notes:''},
+  {id:'s58', done:false,area:'house',deadline:'',blocked:'',title:'New electrical panel map',notes:''},
+  {id:'s59', done:false,area:'house',deadline:'',blocked:'New electrical panel map',title:'Label breakers',notes:''},
+  {id:'s60', done:false,area:'house',deadline:'',blocked:'',title:'City water shut off — know location',notes:''},
+  {id:'s61', done:false,area:'house',deadline:'',blocked:'',title:'Shower wall glass',notes:''},
+  {id:'s62', done:false,area:'house',deadline:'',blocked:'',title:"Buy 8' PVC",notes:''},
+  {id:'s63', done:false,area:'house',deadline:'',blocked:'',title:'Buy PVC cement',notes:''},
+  {id:'s64', done:false,area:'house',deadline:'',blocked:'',title:'Buy white silicone',notes:''},
+  {id:'s65', done:false,area:'house',deadline:'',blocked:"Buy 8' PVC; PVC cement; white silicone",title:'Make BBQ access to trap',notes:''},
+  {id:'s66', done:false,area:'house',deadline:'',blocked:'',title:'Fan in attic window',notes:''},
+  {id:'s67', done:false,area:'house',deadline:'',blocked:'',title:'Organize tool boxes',notes:''},
+  {id:'s68', done:false,area:'house',deadline:'',blocked:'',title:'Touch up blue paint',notes:''},
+  {id:'s69', done:false,area:'house',deadline:'',blocked:'',title:'Mount TP holder',notes:''},
+  {id:'s70', done:false,area:'house',deadline:'',blocked:'',title:'New kitchen drawer tabs',notes:''},
+  {id:'s71', done:false,area:'house',deadline:'',blocked:'',title:'Fix butterfly frames',notes:''},
+  {id:'s72', done:false,area:'house',deadline:'',blocked:'',title:'Clean basement',notes:''},
+  {id:'s73', done:false,area:'house',deadline:'',blocked:'',title:'Hallway art',notes:''},
+  {id:'s74', done:false,area:'house',deadline:'',blocked:'',title:'Hot tub table / side table',notes:''},
+  {id:'s75', done:false,area:'house',deadline:'',blocked:'',title:'Hot tub stand',notes:''},
+  {id:'s76', done:false,area:'house',deadline:'',blocked:'',title:'Backyard TV',notes:''},
+  {id:'s77', done:false,area:'house',deadline:'',blocked:'',title:'Water shut off — know location',notes:''},
+  {id:'s78', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Fix Oculus',notes:''},
+  {id:'s79', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Pre-order GTA6',notes:''},
+  {id:'s80', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Shell bracelet',notes:''},
+  {id:'s81', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Outdoor stained glass art — design + build',notes:''},
+  {id:'s82', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Army helmet lamp — buy helmet, order parts, build',notes:''},
+  {id:'s83', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Build Arduino lightbulb project',notes:''},
+  {id:'s84', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Wood glass thing',notes:''},
+  {id:'s85', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Play Starfox',notes:''},
+  {id:'s86', done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Pass Ghost of Yotel',notes:''},
+  {id:'s240',done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Play: Zelda — A Link to the Past',notes:''},
+  {id:'s241',done:false,area:'sidehustle1',deadline:'',blocked:'',title:"Play: Zelda — Link's Awakening",notes:''},
+  {id:'s242',done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Play: Super Mario World',notes:''},
+  {id:'s243',done:false,area:'sidehustle1',deadline:'',blocked:'',title:'Play: Megaman',notes:''},
+  {id:'s87', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Squid Game 3',notes:''},
+  {id:'s88', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: The Assessment',notes:''},
+  {id:'s89', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Frankenstein',notes:''},
+  {id:'s90', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Black Phone 1 & 2',notes:''},
+  {id:'s91', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Good Boy',notes:''},
+  {id:'s92', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Minecraft Movie',notes:''},
+  {id:'s93', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Avatar',notes:''},
+  {id:'s94', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Men in Black',notes:''},
+  {id:'s95', done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Jungle Cruise',notes:''},
+  {id:'s200',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Land Before Time',notes:''},
+  {id:'s201',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: All Dogs Go to Heaven',notes:''},
+  {id:'s202',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Blank Cheque',notes:''},
+  {id:'s203',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Short Circuit',notes:''},
+  {id:'s204',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Jurassic Park',notes:''},
+  {id:'s205',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: John Carter',notes:''},
+  {id:'s206',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Star Wars Trilogy',notes:'3 films'},
+  {id:'s207',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: All Ghibli Films',notes:''},
+  {id:'s208',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Adventures in Babysitting',notes:''},
+  {id:'s209',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Indiana Jones (series)',notes:''},
+  {id:'s210',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Sahara',notes:''},
+  {id:'s211',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: National Treasure',notes:''},
+  {id:'s212',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Stargate',notes:''},
+  {id:'s213',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Labyrinth',notes:''},
+  {id:'s214',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Dark Crystal',notes:''},
+  {id:'s215',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Honey I Shrunk the Kids',notes:''},
+  {id:'s216',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Lilo and Stitch',notes:''},
+  {id:'s217',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: The Mummy',notes:''},
+  {id:'s218',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Mystery Men',notes:''},
+  {id:'s219',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Mannequin',notes:''},
+  {id:'s220',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Addicted to Love',notes:''},
+  {id:'s221',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Star Trek remixes',notes:''},
+  {id:'s222',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Galaxy Quest',notes:''},
+  {id:'s223',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Alita: Battle Angel',notes:''},
+  {id:'s224',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: City of Ember',notes:''},
+  {id:'s225',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Jumanji',notes:''},
+  {id:'s226',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Back to the Future (trilogy)',notes:''},
+  {id:'s227',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Uncharted',notes:''},
+  {id:'s228',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: The Big Hit',notes:''},
+  {id:'s229',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Pagemaster',notes:''},
+  {id:'s230',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch: Secret of NiMH',notes:''},
+  {id:'s231',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch TV: Tailspin',notes:''},
+  {id:'s232',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch TV: Chip and Dale',notes:''},
+  {id:'s233',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch TV: Darkwing Duck',notes:''},
+  {id:'s234',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch TV: Gummy Bears',notes:''},
+  {id:'s235',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch TV: Farscape',notes:''},
+  {id:'s236',done:false,area:'sidehustle2',deadline:'',blocked:'',title:'Watch TV: Lost in Space',notes:''},
 ];
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let tasks=[], settings={};
-let activeArea='all', activeStatus='active';
-let urgencyFilter='all', effortFilter='all', searchQuery='';
+let activeTab='active';   // 'active' | 'due-soon' | 'overdue' | 'done'
+let activeArea='all';     // 'all' | area key
+let searchQuery='';
 let currentView='list';
 let tokenClient, accessToken=null;
 let saveTimer=null;
 let pendingDeleteAreaKey=null;
 let blockedPickerSelected=[];
+
+// ─── Theme ────────────────────────────────────────────────────────────────────
+function initTheme(){
+  const pref=settings.theme||localStorage.getItem('lifehq_theme')||'auto';
+  applyTheme(pref,false);
+  syncThemePicker(pref);
+}
+
+function applyTheme(pref,save=true){
+  const dark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const resolved=pref==='auto'?(dark?'dark':'light'):pref;
+  document.documentElement.setAttribute('data-theme',resolved);
+  if(save){
+    localStorage.setItem('lifehq_theme',pref);
+    settings.theme=pref;
+  }
+}
+
+function setTheme(pref){applyTheme(pref);syncThemePicker(pref);}
+
+function syncThemePicker(pref){
+  ['light','auto','dark'].forEach(t=>{
+    document.getElementById('theme-'+t)?.classList.toggle('active',t===pref);
+  });
+}
+
+// Listen for OS theme changes (when on 'auto')
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{
+  const pref=settings.theme||localStorage.getItem('lifehq_theme')||'auto';
+  if(pref==='auto')applyTheme('auto',false);
+});
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+let toastTimer=null;
+function showToast(msg='Saved'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 window.onload=()=>{
@@ -737,7 +725,7 @@ window.onload=()=>{
     client_id:CLIENT_ID,
     scope:'https://www.googleapis.com/auth/spreadsheets',
     callback:async(r)=>{
-      if(r.error){setSyncStatus('error');return;}
+      if(r.error)return;
       accessToken=r.access_token;
       document.getElementById('signin-screen').style.display='none';
       document.getElementById('app').style.display='flex';
@@ -758,56 +746,50 @@ function signOut(){
 
 // ─── Sheets I/O ───────────────────────────────────────────────────────────────
 async function loadFromSheet(){
-  setSyncStatus('saving');
   try{
     const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!A1:B1`,{headers:{Authorization:`Bearer ${accessToken}`}});
     if(r.status===401){tokenClient.requestAccessToken({prompt:''});return;}
     const d=await r.json();
     const v=d.values?.[0]||[];
-    tasks=(v[0]?JSON.parse(v[0]):[]).map(t=>({...t,effort:migrateEffort(t.effort)}));
+    tasks=v[0]?JSON.parse(v[0]):[];
     settings=v[1]?JSON.parse(v[1]):{};
     if(!tasks.length){tasks=SEED_TASKS.map((t,i)=>({...t,createdAt:Date.now()-i*1000}));await saveToSheet();}
-    buildSidebar();rebuildAreaSelect();renderAll();
-    setSyncStatus('saved');setTimeout(()=>setSyncStatus(''),2000);
-  }catch(e){setSyncStatus('error');console.error(e);}
+    initTheme();rebuildAreaSelect();renderAll();
+  }catch(e){console.error(e);}
 }
 
 async function saveToSheet(){
-  setSyncStatus('saving');
   try{
-    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!A1:B1?valueInputOption=RAW`,{
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1!A1:B1?valueInputOption=RAW`,{
       method:'PUT',
       headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json'},
       body:JSON.stringify({values:[[JSON.stringify(tasks),JSON.stringify(settings)]]})
     });
-    if(r.status===401){tokenClient.requestAccessToken({prompt:''});return;}
-    setSyncStatus('saved');setTimeout(()=>setSyncStatus(''),2000);
-  }catch(e){setSyncStatus('error');}
+  }catch(e){console.error(e);}
 }
 
 function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveToSheet,800);}
-function setSyncStatus(cls){const d=document.getElementById('sync-dot');d.className='sync-dot'+(cls?' '+cls:'');}
 
 // ─── Areas ────────────────────────────────────────────────────────────────────
 function getAreas(){
   const hidden=settings.hiddenAreas||[];
   const out={};
   Object.keys(AREAS_DEFAULT).forEach(k=>{if(!hidden.includes(k))out[k]=AREAS_DEFAULT[k];});
+  (settings.customAreas||[]).forEach(a=>{if(!hidden.includes(a.key))out[a.key]={icon:a.icon||'ph-tag',label:a.label};});
   return out;
 }
 
-function areaLabel(k){return settings['label_'+k]||AREAS_DEFAULT[k]?.label||k;}
-function areaIcon(k){return AREAS_DEFAULT[k]?.icon||'ph-tag';}
+function areaLabel(k){
+  if(settings['label_'+k])return settings['label_'+k];
+  if(AREAS_DEFAULT[k])return AREAS_DEFAULT[k].label;
+  const ca=(settings.customAreas||[]).find(a=>a.key===k);
+  return ca?ca.label:k;
+}
 
-function buildSidebar(){
-  const areas=getAreas();
-  const el=document.getElementById('sidebar-areas');
-  el.innerHTML=Object.keys(areas).map(k=>`
-    <div class="nav-item" onclick="filterArea('${k}');closeSidebar()" id="nav-${k}">
-      <i class="ph-duotone ${areaIcon(k)} ph"></i>
-      <span class="nav-item-text">${escHtml(areaLabel(k))}</span>
-      <span class="nav-count" id="count-${k}">0</span>
-    </div>`).join('');
+function areaIcon(k){
+  if(AREAS_DEFAULT[k])return AREAS_DEFAULT[k].icon;
+  const ca=(settings.customAreas||[]).find(a=>a.key===k);
+  return ca?(ca.icon||'ph-tag'):'ph-tag';
 }
 
 function rebuildAreaSelect(){
@@ -816,77 +798,82 @@ function rebuildAreaSelect(){
     `<option value="${k}">${areaLabel(k)}</option>`).join('');
 }
 
-// ─── Filters / State ──────────────────────────────────────────────────────────
-function filterArea(a){
-  activeArea=a;activeStatus='active';
-  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
-  document.getElementById('nav-'+a)?.classList.add('active');
-  clearStatCards();
+// ─── Areas bottom sheet ───────────────────────────────────────────────────────
+function openAreasSheet(){
+  const areas=getAreas();
+  const ac=tasks.filter(t=>!t.done);
+  const all=ac.length;
+  const areaItems=Object.keys(areas).map(k=>({
+    key:k, icon:areaIcon(k), label:areaLabel(k), count:ac.filter(t=>t.area===k).length
+  }));
+
+  const row=(key,icon,label,count,isArea)=>{
+    const active=isArea?(activeArea===key):(activeArea===key);
+    return`<div class="areas-sheet-item ${active?'active':''}" onclick="${isArea?`filterAreaAndClose('${key}')`:`filterAreaAndClose('${key}')`}">
+      <i class="ph-duotone ${icon} ph"></i>
+      <span class="areas-sheet-item-text">${escHtml(label)}</span>
+      <span class="areas-sheet-count">${count}</span>
+    </div>`;
+  };
+
+  document.getElementById('areas-sheet-body').innerHTML=`
+    <div class="areas-sheet-label">View All</div>
+    ${row('all','ph-list-checks','All Tasks',all,false)}
+    <div class="areas-divider"></div>
+    <div class="areas-sheet-label">Areas</div>
+    ${areaItems.map(a=>row(a.key,a.icon,a.label,a.count,true)).join('')}`;
+
+  document.getElementById('areas-modal').classList.add('open');
+}
+
+function closeAreasSheet(){document.getElementById('areas-modal').classList.remove('open');}
+
+function filterAreaAndClose(a){
+  activeArea=a;render();closeAreasSheet();
+}
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
+function setTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+tab)?.classList.add('active');
   render();
 }
 
-function filterStatus(s){
-  activeStatus=s;activeArea='all';
-  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
-  document.getElementById('nav-'+s)?.classList.add('active');
-  clearStatCards();
-  render();
+function updateTabCounts(){
+  const ac=tasks.filter(t=>!t.done);
+  document.getElementById('tcount-active').textContent=ac.length;
+  document.getElementById('tcount-due-soon').textContent=ac.filter(isDueSoon).length;
+  document.getElementById('tcount-overdue').textContent=ac.filter(isOverdue).length;
+  document.getElementById('tcount-done').textContent=tasks.filter(t=>t.done).length;
 }
 
-function toggleFilter(type,val){
-  if(type==='urgency'){
-    urgencyFilter=val;
-    document.querySelectorAll('[id^="f-urgency-"]').forEach(b=>b.classList.remove('active'));
-    document.getElementById('f-urgency-'+val)?.classList.add('active');
-  } else {
-    effortFilter=val;
-    document.querySelectorAll('[id^="f-effort-"]').forEach(b=>b.classList.remove('active'));
-    document.getElementById('f-effort-'+val)?.classList.add('active');
-  }
-  render();
-}
-
+// ─── Search ───────────────────────────────────────────────────────────────────
 function searchTasks(q){searchQuery=q.toLowerCase();render();}
 
-function statFilter(type){
-  clearStatCards();
-  document.getElementById('stat-card-'+type)?.classList.add('active');
-  if(type==='active'){activeArea='all';activeStatus='active';urgencyFilter='all';}
-  else if(type==='high'){activeArea='all';activeStatus='active';urgencyFilter='high';}
-  else if(type==='due-soon'){activeArea='due-soon';activeStatus='active';}
-  else if(type==='overdue'){activeArea='overdue';activeStatus='active';}
-  else if(type==='done'){activeArea='all';activeStatus='done';}
-  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
-  render();
-}
-
-function clearStatCards(){document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('active'));}
-
+// ─── Filter logic ─────────────────────────────────────────────────────────────
 function getFiltered(){
-  const areas=getAreas();
   return tasks.filter(t=>{
-    if(activeStatus==='done'&&!t.done)return false;
-    if(activeStatus==='active'&&t.done)return false;
-    if(activeArea==='due-soon'&&(!isDueSoon(t)||t.done))return false;
-    if(activeArea==='overdue'&&(!isOverdue(t)||t.done))return false;
-    if(!['all','due-soon','overdue','active','done'].includes(activeArea)&&t.area!==activeArea)return false;
-    if(urgencyFilter!=='all'&&t.urgency!==urgencyFilter)return false;
-    if(effortFilter!=='all'&&t.effort!==effortFilter)return false;
+    // Tab filter
+    if(activeTab==='active'&&t.done)return false;
+    if(activeTab==='active'&&isOverdue(t))return false; // overdue shows separately
+    if(activeTab==='due-soon'&&(t.done||!isDueSoon(t)))return false;
+    if(activeTab==='overdue'&&(t.done||!isOverdue(t)))return false;
+    if(activeTab==='done'&&!t.done)return false;
+    // Area filter
+    if(activeArea!=='all'&&t.area!==activeArea)return false;
+    // Search
     if(searchQuery){const h=(t.title+(t.notes||'')+(t.blocked||'')).toLowerCase();if(!h.includes(searchQuery))return false;}
     return true;
   });
 }
 
 function sortTasks(list){
-  const uo={high:0,med:1,low:2};
   return list.slice().sort((a,b)=>{
     if(a.done!==b.done)return a.done?1:-1;
-    if(isOverdue(a)!==isOverdue(b))return isOverdue(a)?-1:1;
-    const ua=uo[a.urgency]??1,ub=uo[b.urgency]??1;
-    if(ua!==ub)return ua-ub;
     if(a.deadline&&b.deadline)return new Date(a.deadline)-new Date(b.deadline);
     if(a.deadline)return-1;if(b.deadline)return 1;
-    return 0;
+    return(a.createdAt||0)-(b.createdAt||0);
   });
 }
 
@@ -896,37 +883,59 @@ function isDueSoon(t){if(!t.deadline||t.done)return false;const diff=(new Date(t
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ─── Render ───────────────────────────────────────────────────────────────────
-function updateCounts(){
-  const ac=tasks.filter(t=>!t.done);
-  const areas=getAreas();
-  document.getElementById('count-all').textContent=ac.length;
-  document.getElementById('count-overdue').textContent=ac.filter(isOverdue).length;
-  document.getElementById('count-due-soon').textContent=ac.filter(isDueSoon).length;
-  Object.keys(areas).forEach(k=>{const el=document.getElementById('count-'+k);if(el)el.textContent=ac.filter(t=>t.area===k).length;});
-  document.getElementById('stat-total').textContent=ac.length;
-  document.getElementById('stat-urgent').textContent=ac.filter(t=>t.urgency==='high').length;
-  document.getElementById('stat-duesoon').textContent=ac.filter(isDueSoon).length;
-  document.getElementById('stat-overdue').textContent=ac.filter(isOverdue).length;
-  document.getElementById('stat-done').textContent=tasks.filter(t=>t.done).length;
-}
-
-function renderAll(){updateCounts();render();}
+function renderAll(){updateTabCounts();render();}
 
 function render(){
   if(currentView==='weekly'){renderWeekly();return;}
-  const list=sortTasks(getFiltered());
+  const allFiltered=sortTasks(getFiltered());
   const el=document.getElementById('task-list');
-  if(!list.length){
+
+  if(!allFiltered.length){
     el.innerHTML=`<div class="empty-state"><i class="ph-duotone ph-check-circle ph"></i><p>Nothing here.</p></div>`;
     return;
   }
-  el.innerHTML=list.map(renderCard).join('');
-  list.forEach(t=>initSwipe(document.getElementById('wrapper-'+t.id),t.id));
+
+  // Group by area
+  const areas=getAreas();
+  // Determine which areas to show (maintain area definition order)
+  const areaKeys=Object.keys(areas);
+  // Also include any area keys found in tasks that may not be in current areas (edge case)
+  allFiltered.forEach(t=>{if(!areaKeys.includes(t.area))areaKeys.push(t.area);});
+
+  let html='';
+  let anyContent=false;
+
+  // If filtering to a specific area, just show that area
+  const areaScope=activeArea==='all'?areaKeys:[activeArea];
+
+  areaScope.forEach(k=>{
+    const areaName=areaLabel(k);
+    const icon=areaIcon(k);
+    const areaTasksAll=allFiltered.filter(t=>t.area===k);
+    if(activeArea==='all'&&areaTasksAll.length===0)return; // skip empty areas when showing all
+
+    anyContent=true;
+    html+=`<div class="area-group">
+      <div class="area-group-header"><i class="ph-duotone ${icon} ph"></i>${escHtml(areaName)}</div>
+      <div class="area-group-tasks" id="agroup-${k}">`;
+
+    if(areaTasksAll.length){
+      html+=areaTasksAll.map(renderCard).join('');
+    } else {
+      html+=`<div class="area-group-empty">No tasks here.</div>`;
+    }
+    html+=`</div></div>`;
+  });
+
+  if(!anyContent){
+    html=`<div class="empty-state"><i class="ph-duotone ph-check-circle ph"></i><p>Nothing here.</p></div>`;
+  }
+
+  el.innerHTML=html;
+  allFiltered.forEach(t=>initSwipe(document.getElementById('wrapper-'+t.id),t.id));
 }
 
 function renderCard(t){
-  const urg=URGENCIES[t.urgency]||URGENCIES.med;
-  const eff=EFFORTS[t.effort]||EFFORTS.low;
   let dl='';
   if(t.deadline){
     const ov=isOverdue(t);
@@ -935,7 +944,6 @@ function renderCard(t){
   }
   const blockedHtml=t.blocked?`<div class="task-blocked"><i class="ph-duotone ph-prohibit"></i>${escHtml(t.blocked)}</div>`:'';
   const notesHtml=t.notes?`<div class="task-notes">${escHtml(t.notes)}</div>`:'';
-  const areaLbl=areaLabel(t.area);
   return`<div class="task-wrapper" id="wrapper-${t.id}">
     <div class="swipe-bg swipe-bg-right"><i class="ph-duotone ph-check-circle"></i></div>
     <div class="swipe-bg swipe-bg-left"><i class="ph-duotone ph-trash"></i></div>
@@ -945,13 +953,8 @@ function renderCard(t){
       </div>
       <div class="task-body">
         <div class="task-title">${escHtml(t.title)}</div>
-        <div class="task-meta">
-          <span class="tag tag-area">${escHtml(areaLbl)}</span>
-          <span class="tag ${urg.cls}">${urg.label}</span>
-          <span class="tag ${eff.cls}">${eff.label}</span>
-          ${dl}
-        </div>
-        ${blockedHtml}${notesHtml}
+        ${dl||blockedHtml?`<div class="task-meta">${dl}</div>${blockedHtml}`:''}
+        ${notesHtml}
       </div>
       <div class="task-actions">
         <button class="icon-btn edit" onclick="editTask('${t.id}')"><i class="ph-duotone ph-pencil-simple"></i></button>
@@ -967,41 +970,30 @@ function initSwipe(wrapper,taskId){
   const card=wrapper.querySelector('.task-card');
   const bgRight=wrapper.querySelector('.swipe-bg-right');
   const bgLeft=wrapper.querySelector('.swipe-bg-left');
-  let sx=0,sy=0,dragging=false,dir=null;
+  let sx=0,sy=0,dragging=false;
   const THRESH=90;
-
-  card.addEventListener('touchstart',e=>{
-    sx=e.touches[0].clientX;sy=e.touches[0].clientY;
-    dragging=false;dir=null;
-    card.style.transition='';
-  },{passive:true});
-
+  card.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;dragging=false;card.style.transition='';},{passive:true});
   card.addEventListener('touchmove',e=>{
-    const dx=e.touches[0].clientX-sx;
-    const dy=e.touches[0].clientY-sy;
-    if(!dragging&&Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>8)return; // vertical scroll
-    if(!dragging&&Math.abs(dx)>8){dragging=true;dir=dx>0?'right':'left';}
+    const dx=e.touches[0].clientX-sx,dy=e.touches[0].clientY-sy;
+    if(!dragging&&Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>8)return;
+    if(!dragging&&Math.abs(dx)>8)dragging=true;
     if(!dragging)return;
     card.style.transform=`translateX(${dx}px)`;
     const pct=Math.min(Math.abs(dx)/THRESH,1);
     if(dx>0){bgRight.style.opacity=pct;bgLeft.style.opacity=0;}
     else{bgLeft.style.opacity=pct;bgRight.style.opacity=0;}
   },{passive:true});
-
   card.addEventListener('touchend',e=>{
     if(!dragging){bgRight.style.opacity=0;bgLeft.style.opacity=0;return;}
     const dx=e.changedTouches[0].clientX-sx;
     if(dx>THRESH){
-      card.style.transition='transform .25s ease,opacity .25s ease';
-      card.style.transform=`translateX(110vw)`;card.style.opacity='0';
+      card.style.transition='transform .25s,opacity .25s';card.style.transform='translateX(110vw)';card.style.opacity='0';
       setTimeout(()=>toggleDone(taskId),250);
     } else if(dx<-THRESH){
-      card.style.transition='transform .25s ease,opacity .25s ease';
-      card.style.transform=`translateX(-110vw)`;card.style.opacity='0';
+      card.style.transition='transform .25s,opacity .25s';card.style.transform='translateX(-110vw)';card.style.opacity='0';
       setTimeout(()=>deleteTask(taskId,true),250);
     } else {
-      card.style.transition='transform .2s ease';
-      card.style.transform='';
+      card.style.transition='transform .2s';card.style.transform='';
       setTimeout(()=>{card.style.transition='';bgRight.style.opacity=0;bgLeft.style.opacity=0;},200);
     }
   });
@@ -1012,53 +1004,38 @@ function renderWeekly(){
   const el=document.getElementById('weekly-view');
   const ac=tasks.filter(t=>!t.done);
   const ov=ac.filter(isOverdue),dw=ac.filter(isDueSoon);
-  const top5=sortTasks(ac).slice(0,5);
   const areas=getAreas();
   const areaRows=Object.keys(areas).map(k=>{
     const c=ac.filter(t=>t.area===k).length;if(!c)return'';
-    const h=ac.filter(t=>t.area===k&&t.urgency==='high').length;
     return`<div class="weekly-task-row">
       <i class="ph-duotone ${areaIcon(k)}" style="font-size:20px;color:var(--accent);flex-shrink:0"></i>
       <div class="task-label" style="flex:1">${escHtml(areaLabel(k))}</div>
       <div style="font-size:12px;color:var(--muted)">${c} task${c!==1?'s':''}</div>
-      ${h?`<span class="tag tag-urgency-high" style="margin-left:6px">${h} high</span>`:''}
     </div>`;
   }).join('');
-
   el.innerHTML=`
     <div class="weekly-title">Weekly Briefing</div>
     <div class="weekly-date">${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
-
     <div class="weekly-section">
-      <div class="weekly-section-header" style="${ov.length?'color:#FF6B63;border-color:rgba(255,59,48,.2)':'color:var(--green);'}">
+      <div class="weekly-section-header" style="${ov.length?'color:#FF6B63':'color:var(--green)'}">
         <i class="ph-duotone ${ov.length?'ph-warning-circle':'ph-check-circle'}"></i>
         ${ov.length?`Overdue (${ov.length})`:'Nothing overdue — great job!'}
       </div>
       ${ov.length?`<div class="weekly-section-body">${ov.map(t=>wRow(t)).join('')}</div>`:''}
     </div>
-
     <div class="weekly-section">
       <div class="weekly-section-header"><i class="ph-duotone ph-fire"></i>Due This Week (${dw.length})</div>
       <div class="weekly-section-body">${dw.length?dw.map(t=>wRow(t)).join(''):'<div style="padding:12px 0;font-size:14px;color:var(--muted)">Nothing due this week.</div>'}</div>
     </div>
-
-    <div class="weekly-section">
-      <div class="weekly-section-header"><i class="ph-duotone ph-star"></i>Top 5 Priorities</div>
-      <div class="weekly-section-body">${top5.map((t,i)=>wRow(t,i+1)).join('')}</div>
-    </div>
-
     <div class="weekly-section">
       <div class="weekly-section-header"><i class="ph-duotone ph-chart-bar"></i>By Area</div>
       <div class="weekly-section-body">${areaRows||'<div style="padding:12px 0;font-size:14px;color:var(--muted)">No active tasks.</div>'}</div>
     </div>`;
 }
 
-function wRow(t,num){
-  const ue={high:'🔴',med:'🟡',low:'🟢'}[t.urgency]||'';
+function wRow(t){
   const dl=t.deadline?new Date(t.deadline+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
   return`<div class="weekly-task-row">
-    ${num!==undefined?`<span class="w-num">${num}</span>`:''}
-    <span style="font-size:14px;flex-shrink:0">${ue}</span>
     <div class="task-label">${escHtml(t.title)}</div>
     <div class="area-badge">${escHtml(areaLabel(t.area))}</div>
     ${dl?`<span class="tag tag-deadline" style="font-size:11px;margin-left:6px">${dl}</span>`:''}
@@ -1070,21 +1047,10 @@ function switchView(v){
   currentView=v;
   document.getElementById('task-list').style.display=v==='list'?'flex':'none';
   document.getElementById('weekly-view').style.display=v==='weekly'?'flex':'none';
-  document.getElementById('stats-grid').style.display=v==='list'?'grid':'none';
+  document.getElementById('tabs').style.display=v==='list'?'flex':'none';
   document.querySelectorAll('.bottom-nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('bnav-'+(v==='list'?'tasks':'weekly'))?.classList.add('active');
   render();
-}
-
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-function toggleSidebar(){
-  const s=document.getElementById('sidebar');
-  const o=document.getElementById('sidebar-overlay');
-  s.classList.toggle('open');o.classList.toggle('open');
-}
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebar-overlay').classList.remove('open');
 }
 
 // ─── Task CRUD ────────────────────────────────────────────────────────────────
@@ -1092,10 +1058,13 @@ function openAddModal(){
   document.getElementById('modal-title').textContent='Add Task';
   document.getElementById('edit-id').value='';
   ['f-title','f-deadline','f-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-urgency').value='med';
-  document.getElementById('f-effort').value='medium';
   document.getElementById('f-blocked').value='';
   updateBlockedDisplay([]);
+  // Pre-select active area if filtering
+  if(activeArea!=='all'){
+    const sel=document.getElementById('f-area');
+    if(sel)sel.value=activeArea;
+  }
   document.getElementById('task-modal').classList.add('open');
   setTimeout(()=>document.getElementById('f-title').focus(),150);
 }
@@ -1106,8 +1075,6 @@ function editTask(id){
   document.getElementById('edit-id').value=id;
   document.getElementById('f-title').value=t.title;
   document.getElementById('f-area').value=t.area;
-  document.getElementById('f-urgency').value=t.urgency;
-  document.getElementById('f-effort').value=t.effort;
   document.getElementById('f-deadline').value=t.deadline||'';
   document.getElementById('f-blocked').value=t.blocked||'';
   document.getElementById('f-notes').value=t.notes||'';
@@ -1119,10 +1086,11 @@ function saveTask(){
   const title=document.getElementById('f-title').value.trim();
   if(!title){document.getElementById('f-title').focus();return;}
   const editId=document.getElementById('edit-id').value;
-  const data={title,area:document.getElementById('f-area').value,urgency:document.getElementById('f-urgency').value,effort:document.getElementById('f-effort').value,deadline:document.getElementById('f-deadline').value||'',blocked:document.getElementById('f-blocked').value,notes:document.getElementById('f-notes').value.trim()};
+  const data={title,area:document.getElementById('f-area').value,deadline:document.getElementById('f-deadline').value||'',blocked:document.getElementById('f-blocked').value,notes:document.getElementById('f-notes').value.trim()};
   if(editId){const i=tasks.findIndex(t=>t.id===editId);if(i!==-1)tasks[i]={...tasks[i],...data};}
   else tasks.push({id:Date.now().toString(),done:false,createdAt:Date.now(),...data});
   scheduleSave();closeModal();renderAll();
+  showToast(editId?'Task updated':'Task saved');
 }
 
 function deleteTask(id,skipConfirm=false){
@@ -1134,13 +1102,13 @@ function toggleDone(id){
   const t=tasks.find(t=>t.id===id);
   if(t){t.done=!t.done;t.doneAt=t.done?Date.now():null;}
   scheduleSave();renderAll();
+  if(t?.done)showToast('Done ✓');
 }
 
 function closeModal(){document.getElementById('task-modal').classList.remove('open');}
 
 // ─── Blocked-by picker ────────────────────────────────────────────────────────
 function openBlockedPicker(){
-  const editId=document.getElementById('edit-id').value;
   const current=(document.getElementById('f-blocked').value||'').split(';').map(s=>s.trim()).filter(Boolean);
   blockedPickerSelected=[...current];
   renderBlockedPicker('');
@@ -1155,7 +1123,7 @@ function renderBlockedPicker(q){
   const list=tasks.filter(t=>t.id!==editId&&!t.done&&(!q||t.title.toLowerCase().includes(q)));
   document.getElementById('picker-task-list').innerHTML=list.map(t=>{
     const sel=blockedPickerSelected.includes(t.title);
-    return`<div class="picker-task-item ${sel?'selected':''}" onclick="toggleBlockedTask('${t.id}','${escHtml(t.title).replace(/'/g,'&#39;')}')">
+    return`<div class="picker-task-item ${sel?'selected':''}" onclick="toggleBlockedTask('${escHtml(t.title).replace(/'/g,'&#39;')}')">
       <div class="picker-checkbox">${sel?'<i class="ph-duotone ph-check"></i>':''}</div>
       <div><div class="picker-task-title">${escHtml(t.title)}</div><div class="picker-task-area">${escHtml(areaLabel(t.area))}</div></div>
     </div>`;
@@ -1163,10 +1131,9 @@ function renderBlockedPicker(q){
   renderBlockedChipsPreview();
 }
 
-function toggleBlockedTask(id,title){
+function toggleBlockedTask(title){
   const idx=blockedPickerSelected.indexOf(title);
-  if(idx>=0)blockedPickerSelected.splice(idx,1);
-  else blockedPickerSelected.push(title);
+  if(idx>=0)blockedPickerSelected.splice(idx,1);else blockedPickerSelected.push(title);
   renderBlockedPicker(document.getElementById('blocked-search').value.toLowerCase());
 }
 
@@ -1181,8 +1148,7 @@ function removeBlockedChip(title){
 }
 
 function saveBlockedPicker(){
-  const val=blockedPickerSelected.join('; ');
-  document.getElementById('f-blocked').value=val;
+  document.getElementById('f-blocked').value=blockedPickerSelected.join('; ');
   updateBlockedDisplay(blockedPickerSelected);
   closeBlockedPicker();
 }
@@ -1190,25 +1156,43 @@ function saveBlockedPicker(){
 function closeBlockedPicker(){document.getElementById('blocked-modal').classList.remove('open');}
 
 function updateBlockedDisplay(titles){
-  const ph=document.getElementById('blocked-placeholder');
-  const chips=document.getElementById('blocked-field-chips');
-  if(!titles.length){ph.style.display='';chips.innerHTML='';}
-  else{ph.style.display='none';chips.innerHTML=titles.map(t=>`<span class="bf-chip">${escHtml(t)}</span>`).join('');}
+  document.getElementById('blocked-placeholder').style.display=titles.length?'none':'';
+  document.getElementById('blocked-field-chips').innerHTML=titles.map(t=>`<span class="bf-chip">${escHtml(t)}</span>`).join('');
 }
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
 function openSettings(){
-  const areas=getAreas();
-  document.getElementById('settings-areas-list').innerHTML=Object.keys(AREAS_DEFAULT).map(k=>{
-    const hidden=(settings.hiddenAreas||[]).includes(k);
-    if(hidden)return'';
+  syncThemePicker(settings.theme||localStorage.getItem('lifehq_theme')||'auto');
+  renderSettingsAreas();
+  document.getElementById('settings-modal').classList.add('open');
+}
+
+function renderSettingsAreas(){
+  const defaultRows=Object.keys(AREAS_DEFAULT).map(k=>{
+    if((settings.hiddenAreas||[]).includes(k))return'';
     return`<div class="settings-area-item">
       <div class="settings-area-icon"><i class="ph-duotone ${areaIcon(k)}"></i></div>
       <input class="settings-area-input" id="setting-${k}" value="${escHtml(areaLabel(k))}" placeholder="${AREAS_DEFAULT[k].label}"/>
-      <button class="settings-area-del" onclick="promptDeleteArea('${k}')" title="Delete area"><i class="ph-duotone ph-trash"></i></button>
+      <button class="settings-area-del" onclick="promptDeleteArea('${k}')"><i class="ph-duotone ph-trash"></i></button>
     </div>`;
   }).join('');
-  document.getElementById('settings-modal').classList.add('open');
+  const customRows=(settings.customAreas||[]).map(a=>{
+    if((settings.hiddenAreas||[]).includes(a.key))return'';
+    return`<div class="settings-area-item">
+      <div class="settings-area-icon"><i class="ph-duotone ph-tag"></i></div>
+      <input class="settings-area-input" id="setting-${a.key}" value="${escHtml(a.label)}" placeholder="Area name"/>
+      <button class="settings-area-del" onclick="promptDeleteArea('${a.key}')"><i class="ph-duotone ph-trash"></i></button>
+    </div>`;
+  }).join('');
+  document.getElementById('settings-areas-list').innerHTML=defaultRows+customRows;
+}
+
+function addNewArea(){
+  if(!settings.customAreas)settings.customAreas=[];
+  const key='custom_'+Date.now();
+  settings.customAreas.push({key,label:'New Area',icon:'ph-tag'});
+  renderSettingsAreas();
+  setTimeout(()=>{const el=document.getElementById('setting-'+key);if(el){el.focus();el.select();}},50);
 }
 
 function saveSettings(){
@@ -1216,7 +1200,12 @@ function saveSettings(){
     const el=document.getElementById('setting-'+k);
     if(el){const v=el.value.trim();if(v)settings['label_'+k]=v;}
   });
-  scheduleSave();buildSidebar();rebuildAreaSelect();closeSettings();renderAll();
+  (settings.customAreas||[]).forEach(a=>{
+    const el=document.getElementById('setting-'+a.key);
+    if(el){const v=el.value.trim();if(v)a.label=v;}
+  });
+  scheduleSave();rebuildAreaSelect();closeSettings();renderAll();
+  showToast('Settings saved');
 }
 
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
@@ -1230,9 +1219,8 @@ function promptDeleteArea(key){
   const others=Object.keys(areas).filter(k=>k!==key);
   document.getElementById('delete-area-title').textContent=`Delete ${areaLabel(key)}`;
   document.getElementById('delete-area-warning').textContent=
-    count?`This area has ${count} active task${count!==1?'s':''}. Choose where to move them.`:'This area has no active tasks. It will be removed.';
-  const sel=document.getElementById('migrate-target');
-  sel.innerHTML=others.map(k=>`<option value="${k}">${areaLabel(k)}</option>`).join('');
+    count?`This area has ${count} active task${count!==1?'s':''}. Choose where to move them.`:'No active tasks. Safe to remove.';
+  document.getElementById('migrate-target').innerHTML=others.map(k=>`<option value="${k}">${areaLabel(k)}</option>`).join('');
   document.getElementById('migrate-select-wrap').style.display=count?'':'none';
   document.getElementById('delete-area-modal').classList.add('open');
 }
@@ -1240,30 +1228,23 @@ function promptDeleteArea(key){
 function confirmDeleteArea(){
   if(!pendingDeleteAreaKey)return;
   const target=document.getElementById('migrate-target').value;
-  const count=tasks.filter(t=>t.area===pendingDeleteAreaKey).length;
-  if(count&&target)tasks=tasks.map(t=>t.area===pendingDeleteAreaKey?{...t,area:target}:t);
+  if(target)tasks=tasks.map(t=>t.area===pendingDeleteAreaKey?{...t,area:target}:t);
   if(!settings.hiddenAreas)settings.hiddenAreas=[];
   settings.hiddenAreas.push(pendingDeleteAreaKey);
   pendingDeleteAreaKey=null;
-  scheduleSave();closeDeleteAreaModal();buildSidebar();rebuildAreaSelect();renderAll();
+  scheduleSave();closeDeleteAreaModal();rebuildAreaSelect();renderAll();
 }
 
 function closeDeleteAreaModal(){document.getElementById('delete-area-modal').classList.remove('open');pendingDeleteAreaKey=null;}
 
-// ─── Keyboard ────────────────────────────────────────────────────────────────
+// ─── Keyboard & overlays ──────────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();closeBlockedPicker();closeSettings();closeDeleteAreaModal();closeSidebar();}
+  if(e.key==='Escape'){closeModal();closeBlockedPicker();closeSettings();closeDeleteAreaModal();closeAreasSheet();}
   if(e.key==='n'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();
 });
-
-// Close modals on overlay tap
-['task-modal','blocked-modal','settings-modal','delete-area-modal'].forEach(id=>{
+['task-modal','blocked-modal','settings-modal','delete-area-modal','areas-modal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)e.target.classList.remove('open');});
 });
-
-// Bottom nav settings button — wire long-press or just add settings to nav
-// Add settings tap on logo area
-document.querySelector('.header-logo').addEventListener('click',()=>{openSettings();});
 </script>
 </body>
 </html>
