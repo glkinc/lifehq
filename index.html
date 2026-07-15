@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Life HQ</title>
+<title>This Is Fine</title>
 <script>
   // Fast theme init before render — avoids flash
   (function(){
@@ -29,8 +29,11 @@
   --text:#F0F0F8;
   --text2:#C0C0D0;
   --muted:#7878A0;
-  --accent:#00A8E8;
-  --accent-dim:rgba(0,168,232,.15);
+  --label:#A8A8CC;
+  --accent:#FA7B21;
+  --accent-dim:rgba(250,123,33,.18);
+  --accent2:#FBC44A;
+  --accent2-dim:rgba(251,196,74,.16);
   --green:#00D632;
   --green-dim:rgba(0,214,50,.15);
   --red:#FF3B30;
@@ -53,8 +56,11 @@
   --text:#1C1C1E;
   --text2:#48484A;
   --muted:#8E8E93;
-  --accent:#00A8E8;
-  --accent-dim:rgba(0,168,232,.12);
+  --label:#57575E;
+  --accent:#FA7B21;
+  --accent-dim:rgba(250,123,33,.13);
+  --accent2:#FBC44A;
+  --accent2-dim:rgba(251,196,74,.15);
   --green:#34C759;
   --green-dim:rgba(52,199,89,.12);
   --red:#FF3B30;
@@ -71,10 +77,11 @@ html,body{height:100%;overscroll-behavior:none}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden;transition:background .2s,color .2s}
 
 /* ─── Sign-in ─────────────────────────────────────────────────────────────── */
-#signin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:28px;padding:40px 24px;text-align:center}
-.signin-logo{font-size:64px;line-height:1}
+#signin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:28px;padding:40px 24px;text-align:center;background:radial-gradient(circle at 50% 35%,var(--accent-dim),transparent 60%)}
+.signin-logo{width:88px;height:88px}
+.signin-logo svg{width:100%;height:100%;display:block}
 .signin-title{font-size:30px;font-weight:700;letter-spacing:-.5px}
-.signin-sub{font-size:15px;color:var(--muted);max-width:280px;line-height:1.6;margin-top:6px}
+.signin-sub{font-size:15px;color:var(--text);max-width:280px;line-height:1.6;margin-top:6px}
 .signin-btn{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 24px;font-size:16px;font-weight:600;color:var(--text);cursor:pointer;width:100%;max-width:300px;justify-content:center;transition:background .15s}
 .signin-btn:active{background:var(--surface2)}
 .signin-btn svg{width:22px;height:22px;flex-shrink:0}
@@ -85,22 +92,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ─── Header ─────────────────────────────────────────────────────────────── */
 .header{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
 .header-row1{display:flex;align-items:center;padding:14px 16px 12px;gap:10px}
-.header-logo{display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0}
-.header-logo-icon{font-size:22px;color:var(--accent)}
-.header-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.header-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.header-logo-badge{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent-dim),var(--accent2-dim));flex-shrink:0}
+.header-logo-svg{width:24px;height:24px;display:block}
 .header-search{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px}
 .header-search .ph{font-size:16px;color:var(--muted);flex-shrink:0}
 .header-search input{background:transparent;border:none;outline:none;font-size:14px;color:var(--text);width:100%}
 .header-search input::placeholder{color:var(--muted)}
+.header-settings-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}
+.header-settings-btn:active{background:var(--surface3)}
+.header-settings-btn .ph{font-size:18px}
 
 /* ─── Tabs ────────────────────────────────────────────────────────────────── */
 .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 2px 8px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;user-select:none;gap:2px}
-.tab-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;letter-spacing:.01em;transition:color .15s}
-.tab-count{font-size:16px;font-weight:700;color:var(--muted);transition:color .15s;line-height:1}
+.tab-label{font-size:11px;font-weight:600;color:var(--label);white-space:nowrap;letter-spacing:.01em;transition:color .15s}
+.tab-count{font-size:16px;font-weight:700;color:var(--label);transition:color .15s;line-height:1}
+.tab.active{background:var(--accent-dim);border-bottom-color:var(--accent)}
 .tab.active .tab-label{color:var(--accent)}
 .tab.active .tab-count{color:var(--accent)}
-.tab.active{border-bottom-color:var(--accent)}
 .tab:active{background:var(--surface2)}
 
 /* ─── Main layout ─────────────────────────────────────────────────────────── */
@@ -112,8 +122,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* Area group */
 .area-group{margin-bottom:4px}
-.area-group-header{display:flex;align-items:center;gap:8px;padding:14px 4px 8px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.area-group-header .ph{font-size:16px;color:var(--accent)}
+.area-group-header{display:flex;align-items:center;gap:8px;padding:14px 4px 8px;font-size:12px;font-weight:700;color:var(--label);text-transform:uppercase;letter-spacing:.06em}
+.area-group-icon-chip{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent-dim),var(--accent2-dim));flex-shrink:0}
+.area-group-header .ph{font-size:14px;color:var(--accent)}
 .area-group-tasks{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
 .area-group-empty{font-size:13px;color:var(--muted);padding:8px 4px 16px;font-style:italic}
 
@@ -126,17 +137,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .swipe-bg-left .ph{font-size:26px;color:#fff}
 
 .task-card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;gap:12px;align-items:flex-start;will-change:transform;z-index:1;transition:box-shadow .15s}
+.task-card.simple{align-items:center}
 .task-card.done{opacity:.4}
 .task-card.done .task-title{text-decoration:line-through;color:var(--muted)}
 
-.task-check{width:24px;height:24px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s}
-.task-check:active{transform:scale(.9)}
-.task-check.checked{background:var(--green);border-color:var(--green)}
-.task-check.checked .ph{color:#fff;font-size:14px}
-.task-check .ph{font-size:14px;color:var(--muted)}
+.drag-handle{display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--label);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.drag-handle:active{cursor:grabbing}
+.drag-handle .ph{font-size:18px}
+.task-grab{width:24px;height:24px;margin-top:1px}
+.task-card.simple .task-grab{margin-top:0}
+.settings-area-drag{width:20px}
+.dragging{opacity:.5}
+.task-wrapper.dragging{position:relative;z-index:10}
 
 .task-body{flex:1;min-width:0}
 .task-title{font-size:15px;font-weight:500;margin-bottom:4px;line-height:1.4}
+.task-card.simple .task-title{margin-bottom:0}
 .task-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
 .tag{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
 .tag-deadline{background:var(--orange-dim);color:var(--orange)}
@@ -160,7 +176,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ─── Weekly view ─────────────────────────────────────────────────────────── */
 .weekly-view{flex:1;overflow-y:auto;padding:14px 14px 100px;display:none;flex-direction:column;gap:12px}
 .weekly-title{font-size:20px;font-weight:700;letter-spacing:-.3px}
-.weekly-date{font-size:13px;color:var(--muted);margin-top:2px;margin-bottom:4px}
+.weekly-date{font-size:13px;color:var(--label);margin-top:2px;margin-bottom:4px}
 .weekly-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
 .weekly-section-header{padding:14px 16px;font-weight:600;font-size:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;border-radius:var(--radius) var(--radius) 0 0}
 .weekly-section-header .ph{font-size:18px}
@@ -168,13 +184,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .weekly-task-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
 .weekly-task-row:last-child{border-bottom:none}
 .weekly-task-row .task-label{flex:1;font-size:14px;line-height:1.3}
-.weekly-task-row .area-badge{font-size:11px;color:var(--muted);white-space:nowrap}
+.weekly-task-row .area-badge{font-size:11px;color:var(--label);white-space:nowrap}
 
 /* ─── Bottom nav ──────────────────────────────────────────────────────────── */
 .bottom-nav{background:var(--surface);border-top:1px solid var(--border);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
-.bottom-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:500;min-height:60px;transition:color .15s;-webkit-tap-highlight-color:transparent}
+.bottom-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px;margin:6px 3px 2px;cursor:pointer;border:none;border-radius:14px;background:transparent;color:var(--label);font-size:10px;font-weight:500;min-height:52px;transition:all .15s;-webkit-tap-highlight-color:transparent}
 .bottom-nav-btn .ph{font-size:24px;transition:color .15s}
-.bottom-nav-btn.active{color:var(--accent)}
+.bottom-nav-btn.active{color:var(--accent);background:var(--accent-dim)}
 .bottom-nav-btn.active .ph{color:var(--accent)}
 .bottom-nav-btn:active{opacity:.7}
 
@@ -197,7 +213,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .modal-footer .btn{flex:1}
 
 .form-group{display:flex;flex-direction:column;gap:6px}
-.form-label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.form-label{font-size:12px;font-weight:600;color:var(--label);letter-spacing:.04em;text-transform:uppercase}
 .form-input,.form-select,.form-textarea{padding:14px;border:1px solid var(--border);border-radius:12px;font-size:15px;font-family:inherit;outline:none;background:var(--surface2);color:var(--text);transition:border-color .15s;width:100%;-webkit-appearance:none}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
 .form-select option{background:var(--surface2)}
@@ -205,7 +221,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 .btn{padding:15px;border-radius:12px;border:none;cursor:pointer;font-size:15px;font-weight:600;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:active{background:#0090C8}
+.btn-primary:active{background:#E0680F}
 .btn-ghost{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
 .btn-ghost:active{background:var(--border)}
 .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,59,48,.3)}
@@ -218,8 +234,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .theme-opt.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px var(--shadow)}
 
 /* ─── Areas bottom sheet ─────────────────────────────────────────────────── */
-.areas-sheet-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:10px 4px 4px}
-.areas-sheet-item{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:12px;cursor:pointer;font-size:15px;color:var(--muted);min-height:var(--tap);transition:all .12s}
+.areas-sheet-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--label);padding:10px 4px 4px}
+.areas-sheet-item{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:12px;cursor:pointer;font-size:15px;color:var(--label);min-height:var(--tap);transition:all .12s}
 .areas-sheet-item .ph{font-size:22px;flex-shrink:0}
 .areas-sheet-item:active{background:var(--surface2)}
 .areas-sheet-item.active{background:var(--accent-dim);color:var(--accent)}
@@ -244,7 +260,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .picker-task-item.selected .picker-checkbox{background:var(--accent);border-color:var(--accent)}
 .picker-checkbox .ph{font-size:13px;color:#fff}
 .picker-task-title{font-size:14px;flex:1;line-height:1.3}
-.picker-task-area{font-size:11px;color:var(--muted)}
+.picker-task-area{font-size:11px;color:var(--label)}
 .blocked-field{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;min-height:52px;transition:border-color .15s}
 .blocked-field:active{border-color:var(--accent)}
 .blocked-field .ph{font-size:18px;color:var(--muted);flex-shrink:0}
@@ -255,7 +271,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ─── Settings ────────────────────────────────────────────────────────────── */
 .settings-area-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
-.settings-area-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;color:var(--muted)}
+.settings-area-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;color:var(--label);cursor:pointer;border-radius:8px;transition:background .1s}
+.settings-area-icon:active{background:var(--surface3)}
 .settings-area-input{flex:1;background:transparent;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit}
 .settings-area-del{width:36px;height:36px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);border-radius:8px;flex-shrink:0}
 .settings-area-del:active{background:var(--red-dim)}
@@ -273,6 +290,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .migrate-warning{display:flex;gap:10px;padding:14px;background:var(--red-dim);border-radius:12px;border:1px solid rgba(255,59,48,.25);font-size:14px;line-height:1.5;color:#FF8A85}
 .migrate-warning .ph{font-size:20px;flex-shrink:0;margin-top:1px}
 
+/* ─── Icon picker (Add Area) ──────────────────────────────────────────────── */
+.icon-picker-search{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.icon-picker-search .ph{font-size:16px;color:var(--muted)}
+.icon-picker-search input{background:transparent;border:none;outline:none;font-size:14px;color:var(--text);flex:1}
+.icon-picker-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-height:280px;overflow-y:auto;padding:4px}
+.icon-picker-opt{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid transparent;background:var(--surface2);cursor:pointer;color:var(--text2);transition:all .1s}
+.icon-picker-opt .ph{font-size:20px}
+.icon-picker-opt:active{background:var(--surface3)}
+.icon-picker-opt.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.icon-picker-empty{grid-column:1/-1;text-align:center;font-size:13px;color:var(--muted);padding:20px 0}
+
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
@@ -284,10 +312,148 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <!-- ── Sign-in ── -->
 <div id="signin-screen">
-  <div class="signin-logo">🗂️</div>
+  <div class="signin-logo">
+    <svg version="1.1" id="Layer_1_signin" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 300 300" xml:space="preserve">
+    <style type="text/css">
+      .st0-signin{fill:none;}
+      .st1-signin{fill:#FA7B21;}
+      .st2-signin{fill:#FFFFFF;}
+      .st3-signin{fill:#FBC44A;}
+    </style>
+    <g>
+      <path class="st0-signin" d="M215.3,147.7c0,0.8,0,1.6-0.1,2.4C215.3,149.3,215.3,148.5,215.3,147.7z"/>
+      <path class="st0-signin" d="M168.1,162.4c-0.1-0.2-0.3-0.4-0.4-0.6C167.8,162,167.9,162.2,168.1,162.4z"/>
+      <path class="st0-signin" d="M215.1,150.8c-0.1,0.6-0.1,1.1-0.2,1.7C215,152,215.1,151.4,215.1,150.8z"/>
+      <path class="st0-signin" d="M214.8,153.3c-0.1,0.7-0.3,1.4-0.5,2.1C214.5,154.7,214.7,154,214.8,153.3z"/>
+      <path class="st0-signin" d="M214.1,156.1c-0.1,0.5-0.3,1-0.4,1.4C213.8,157,214,156.6,214.1,156.1z"/>
+      <path class="st0-signin" d="M170.8,166.3c-0.1-0.2-0.3-0.3-0.4-0.5C170.5,166,170.7,166.2,170.8,166.3z"/>
+      <path class="st0-signin" d="M225,164.7c0.9,0.1,1.8,0.1,2.7,0.2C226.8,164.8,225.9,164.7,225,164.7z"/>
+      <path class="st0-signin" d="M169.4,164.5c-0.2-0.2-0.3-0.4-0.4-0.6C169.1,164.1,169.2,164.3,169.4,164.5z"/>
+      <path class="st0-signin" d="M176.4,171.3c-0.1-0.1-0.3-0.2-0.4-0.3C176.1,171.1,176.2,171.2,176.4,171.3z"/>
+      <path class="st0-signin" d="M174.4,169.8c-0.1-0.1-0.2-0.1-0.2-0.2C174.2,169.7,174.3,169.8,174.4,169.8z"/>
+      <path class="st0-signin" d="M213.3,158.5c-0.1,0.4-0.3,0.7-0.4,1.1C213,159.2,213.2,158.9,213.3,158.5z"/>
+      <path class="st0-signin" d="M172.4,168C172.4,168,172.3,168,172.4,168C172.3,168,172.4,168,172.4,168z"/>
+      <path class="st1-signin" d="M174.3,91.2c0.5,0.3,0.9,0.6,1.4,0.9c3-7.2,5.2-15.3,6.6-24.4c3.1-19.5,1.9-38,1.1-46.5
+        c42.2,11.2,44,61.7,44.8,83.7c0.2,5.7,0.3,8.5,0.9,10.3c1.1,3.7,3.8,5.9,7.2,5.7c7.3-0.3,14.8-10.8,19.4-26.4
+        c4.1,8.3,7.1,16.8,8.9,25.4c2.4,11.8,2.7,24.6,1.1,37.3c1.1,0.6,2.2,1.2,3.2,1.9c1.1,0.8,2.1,1.6,3.1,2.5
+        c2.3-14.8,2.2-29.5-0.6-43.2c-2.5-12-7.2-23.8-14-35.2c-0.7-1.2-2.2-1.9-3.6-1.6c-1.4,0.2-2.5,1.3-2.8,2.7
+        c-4.4,22.1-12.9,29.5-15,29.6c-0.1-0.1-0.2-0.3-0.3-0.7c-0.3-1-0.4-4.9-0.6-8.5c-0.9-24.5-3-81.7-55.1-91.4c-1.1-0.2-2.2,0.1-3,0.9
+        c-0.8,0.8-1.2,1.9-1,3c0.1,0.6,5.8,40.8-6.5,71.6c1.2,0.4,2.3,0.9,3.3,1.4C173.3,90.6,173.8,90.9,174.3,91.2z"/>
+      <path class="st1-signin" d="M240,226.1c-0.5,0.1-0.9,0.1-1.4,0.2c-0.7,0.1-1.4,0.2-2.1,0.3c-3.3,0.4-6.5,0.5-9.6,0.5
+        c-12,0-22.1-2.6-29.9-5.6c-2,3.8-6.4,15.7-3,24.7c1.8,4.7-1.5,11-9,17.2c-10,8.3-27.8,14.7-47.7,14.7c-11.9,0-24.6-2.9-36.9-10.3
+        c-21.4-12.9-31.6-25.6-36.5-35.6c-0.6-1.2-1.1-2.3-1.5-3.4c-0.3-0.9-0.7-1.7-0.9-2.5c-0.6,0.1-1.2,0.1-1.8,0.2
+        c-1.2,0.1-2.3,0-3.5-0.1c0,0.5,0,1,0.1,1.5c1.8,24.7,28,41.9,39.3,48.1c13.8,7.7,29.7,11.5,46.2,11.5c13.3,0,27.1-2.5,40.5-7.6
+        c13.2-5,25.9-12.5,38.6-22.8c9.4-7.6,15.7-17.5,21.7-27c1.1-1.7,2.2-3.5,3.4-5.2c-1.5,0.4-3.1,0.8-4.8,1.1
+        C240.6,226,240.3,226.1,240,226.1z M216.3,251.8C216.3,251.8,216.3,251.8,216.3,251.8c0,0,0-0.1,0-0.1c0.1-0.1,0.2-0.2,0.4-0.2
+        C216.6,251.5,216.5,251.6,216.3,251.8z"/>
+      <path class="st1-signin" d="M258.3,126.5c-0.5-2.5-3.7-3.5-5.5-1.7c-13.7,13.3-33.8,17.9-34.6-2.7c-0.7-18.9-3.3-57.7-14.2-69.1
+        c-2.6-2.7-7.2-0.6-7,3.1c0.5,10.6,0,32.4-9.4,50c0.8,2.3,1.2,4.7,1.2,7.5c7.4-0.1,14.5,2.6,20.3,7.9c3.2,2.9,5.8,6.3,7.7,10.2
+        c1.9,3.8,3.1,8.1,3.5,12.5c0.5,5.3-0.2,10.4-1.8,15c5.6-0.2,10.6,0.1,14.7,0.7c3.9-2.7,8.7-4.7,13.9-5.5c4.1-0.6,8.1-0.4,11.8,0.4
+        C260,145,260.1,135.3,258.3,126.5z"/>
+      <path class="st1-signin" d="M114.2,221.4c4.7-4.7,6.4-11.3,5.1-17.3c-8.3-1.8-15.6-6.9-20.6-14c-3.8,0.6-7.5,2.3-10.5,5.3
+        c-0.6,0.6-1.1,1.1-1.5,1.7c-1,5.5-2.3,10.2-3.9,13.6c0.5,4,2.2,7.8,5.2,10.8C95.2,228.8,106.9,228.7,114.2,221.4z"/>
+      <path class="st1-signin" d="M75.5,89.3c13.4-19.4,37.1-21.6,46.4-21.7c-0.3-1-0.7-2-1.2-3c-3-6.6-8.3-11.7-14.9-14.4
+        c-3.1-1.3-6.4-1.9-9.6-1.9c-3.5,0-7,0.7-10.3,2.2C73,56.4,67.4,72.4,73.7,86C74.2,87.2,74.8,88.3,75.5,89.3z"/>
+      <path class="st1-signin" d="M113.8,112.9c17.6-7.7,31.8-23.9,37.1-42.2c1.5-5-1.2-10.2-5.9-11.7c-2.2-0.7-4.5-0.5-6.6,0.6
+        c-2.2,1.2-3.8,3.2-4.5,5.6c-3.8,13.1-14.1,24.8-27,30.4c-10.5,4.6-21.2,4.5-30.2-0.4c-1.3-0.7-2.7-1-4-1c-0.9,0-1.7,0.1-2.6,0.4
+        c-2.3,0.7-4.2,2.4-5.3,4.6c-2.3,4.6-0.6,10.3,3.8,12.7c7.2,3.9,14.9,5.8,23.1,5.8C99.1,117.8,106.5,116.1,113.8,112.9z"/>
+      <g>
+        <path class="st2-signin" d="M215.1,144.7c-0.7-7.6-4.1-14.5-9.5-19.4c-4.8-4.3-10.6-6.6-16.6-6.6c-0.7,0-1.5,0-2.3,0.1
+          c-5.8,0.6-11.2,3.2-15.3,7.6c-0.7,0.7-1.4,1.5-2,2.3c-4.4,5.8-6.4,13.2-5.7,20.8c0.3,3.6,1.3,7,2.7,10.1c0.3,0.7,0.7,1.4,1.1,2.1
+          c0.1,0.2,0.2,0.4,0.4,0.6c0.3,0.5,0.6,0.9,0.9,1.4c0.1,0.2,0.3,0.4,0.4,0.6c0.3,0.5,0.7,0.9,1,1.3c0.1,0.2,0.3,0.3,0.4,0.5
+          c0.5,0.6,1,1.1,1.5,1.7c0,0,0,0,0,0c0.6,0.6,1.2,1.1,1.8,1.6c0.1,0.1,0.2,0.1,0.2,0.2c0.5,0.4,1.1,0.8,1.6,1.2
+          c0.1,0.1,0.3,0.2,0.4,0.3c0.2,0.2,0.5,0.3,0.7,0.5c12.7-7.7,25.1-11,35.8-12.1c0,0,0,0,0,0c0.2-0.4,0.3-0.7,0.4-1.1
+          c0.1-0.3,0.2-0.6,0.3-1c0.2-0.5,0.3-1,0.4-1.4c0.1-0.2,0.1-0.5,0.2-0.7c0.2-0.7,0.3-1.4,0.5-2.1c0-0.2,0.1-0.5,0.1-0.7
+          c0.1-0.6,0.2-1.1,0.2-1.7c0-0.2,0.1-0.5,0.1-0.7c0.1-0.8,0.1-1.6,0.1-2.4C215.3,146.7,215.2,145.7,215.1,144.7z M190.5,161.2
+          c-8.9,0-16.2-8.1-16.2-18.1s7.2-18.1,16.2-18.1c8.9,0,16.2,8.1,16.2,18.1S199.4,161.2,190.5,161.2z"/>
+        <path class="st2-signin" d="M124.7,137.1c-0.8,0-1.7,0-2.5,0.1c-15.6,1.5-27,16.7-25.3,33.9c0.7,7.5,3.8,14.2,8.3,19.2
+          c3.2,3.5,7.2,6.3,11.5,7.8c3.6,1.3,7.5,1.9,11.5,1.5c15.6-1.5,27-16.7,25.3-34C152,149.4,139.3,137.1,124.7,137.1z M125,188.9
+          c-9.7,0-17.5-8.8-17.5-19.6c0-10.8,7.8-19.6,17.5-19.6c9.7,0,17.5,8.8,17.5,19.6C142.5,180.1,134.7,188.9,125,188.9z"/>
+      </g>
+      <g>
+        <path class="st3-signin" d="M216.3,251.8C216.3,251.8,216.3,251.8,216.3,251.8c0.1-0.1,0.3-0.2,0.4-0.4c-0.1,0.1-0.2,0.2-0.4,0.2
+          C216.3,251.7,216.3,251.7,216.3,251.8z"/>
+        <path class="st3-signin" d="M264.5,119.8c-1.8-8.6-4.8-17.1-8.9-25.4c-4.6,15.6-12.1,26.1-19.4,26.4c-3.4,0.2-6.1-2-7.2-5.7
+          c-0.5-1.8-0.7-4.6-0.9-10.3c-0.8-22-2.6-72.5-44.8-83.7c0.9,8.6,2.1,27-1.1,46.5c-1.5,9.1-3.7,17.2-6.6,24.4
+          c4.6,3.2,9.6,7.6,11.9,14c9.4-17.6,9.9-39.5,9.4-50c-0.2-3.7,4.4-5.8,7-3.1c10.9,11.4,13.6,50.1,14.2,69.1
+          c0.7,20.6,20.9,16,34.6,2.7c1.9-1.8,5-0.9,5.5,1.7c1.8,8.8,1.8,18.5,0.6,28.4c2.4,0.5,4.6,1.3,6.7,2.3
+          C267.2,144.4,266.9,131.7,264.5,119.8z"/>
+        <path class="st3-signin" d="M256.7,199.6c-1,0.2-2,0.4-3,0.6c-0.4,0.1-0.8,0.1-1.2,0.1c-1.2,0.1-2.3,0.2-3.5,0.2
+          c-13.3,0.1-24.6-7.9-26.3-19.2c-0.8-5.9,1.1-11.6,4.9-16.3c-0.9-0.1-1.8-0.2-2.7-0.2c-0.3,0-0.5,0-0.8,0c-0.1,0-0.1,0-0.2,0
+          c-4.4-0.1-9.3,0.1-14.6,0.9c-8.1,1.3-17.1,3.9-26.3,9c-5.4,2.9-10.9,6.7-16.3,11.4c-0.5,0.4-1.1,0.6-1.6,0.6c-0.7,0-1.5-0.3-2-1
+          c-0.9-1.2-0.8-2.9,0.3-3.9c0.5-0.5,1-0.9,1.6-1.3c0.1-0.1,0.2-0.2,0.3-0.3c0,0,0.3-0.3,0.8-0.6c2.1-1.7,4.2-3.3,6.3-4.8
+          c-1.8-1.3-3.5-2.8-5-4.5c-4.7-5.3-7.9-12.3-8.7-20.1c-0.8-8.9,1.5-17.5,6.7-24.4c4.3-5.7,10.1-9.5,16.6-11.2
+          c1.4-0.4,2.8-0.6,4.3-0.8c0.2,0,0.4,0,0.6,0c-0.8-0.6-1.7-1.3-2.7-2c-3.9-2.7-8.9-5.8-14-8.7c-1-0.6-2-1.1-3-1.7
+          c-1.1-0.6-2.1-1.2-3.1-1.7c-7.8-4.3-14.9-7.9-17-9c-7.6,11.6-18.6,21.3-31.3,26.8c-7.9,3.5-16,5.3-24.1,5.3
+          c-1.2,0-2.4-0.1-3.6-0.1c0.7,4.5,1.3,12.5,1.6,22c0,1.5,0.1,3.1,0.1,4.8c0,1.7,0,3.4,0,5.2c0,14.3-0.9,30.3-3.1,42.6
+          c0.5-0.6,1-1.2,1.5-1.7c3-3,6.7-4.7,10.5-5.3c-3.7-5.2-6.1-11.5-6.8-18.5c-0.9-9.7,1.8-18.8,6.9-25.9c5.4-7.5,13.5-12.7,23-13.6
+          c0.2,0,0.4,0,0.7,0c18.1-1.3,34.3,13.3,36.2,33.1c1.9,20-11.5,37.7-29.9,39.5c-1,0.1-2,0.2-3,0.2c-2.2,0-4.4-0.2-6.5-0.7
+          c1.3,6-0.3,12.6-5.1,17.3c-7.3,7.3-19,7.4-26.2,0.2c-3-3-4.7-6.9-5.2-10.8c-0.5,1.2-1.1,2.2-1.7,3.1c-1.5,2.2-3.3,4.1-5.2,5.8
+          c-2.9,2.5-6.1,4.3-9.5,5.5c3.1,9,11.4,22.3,32.8,36c-0.1-3.7,0.8-6.6,2.1-8.7c1.4-2.2,3.1-3.6,4.5-4.2c1.3-0.6,2.8,0,3.4,1.3
+          c0.6,1.3,0,2.8-1.3,3.3c-0.3,0.1-1.6,0.8-2.6,2.6c-1,1.8-1.7,4.6-0.6,9.1c4,2.3,8.1,4.1,12.1,5.4c-0.5-2.4-0.3-5,0.4-7.4
+          c1.5-6,5.3-11.5,5.9-12.4c0.8-1.1,2.4-1.4,3.5-0.6c1.1,0.8,1.4,2.4,0.6,3.5c-1.5,2.2-4.4,7-5.3,11.5c-0.5,2.3-0.4,4.5,0.6,6.2
+          c0.2,0.3,0.3,0.6,0.3,0.9c24.2,5.8,47.1-2.5,58.8-12.2c4.4-3.7,6.7-7,7.4-9.4c0.3-0.9,0.3-1.7,0.1-2.3c-0.7-1.8-1.1-3.7-1.3-5.6
+          c-1.1-9.2,2.4-18.8,4.4-22.7c-5.9-2.7-8.2-5.5-10.1-6.8c-0.7,0.5-1.4,1-2,1.4c-1,0.6-1.9,1-2.9,1.4c-1.7,0.7-3.4,1-5.1,1
+          c-1.9,0-3.8-0.4-5.6-1.3c-1.3-0.6-1.8-2.1-1.2-3.4c0.6-1.3,2.1-1.8,3.4-1.2c2.2,1.1,4.6,1,7.1,0c0.6-0.2,1.1-0.5,1.7-0.9
+          c5.8-3.5,6.7-8,6.8-13c0.1-1.4,1.3-2.5,2.6-2.4c1.4,0.1,2.5,1.2,2.4,2.6c-0.2,5-1.3,7.6-5.2,12.1c6.1,4.3,26.2,16.3,54.9,11.9
+          c0.3,0,0.6-0.1,0.9-0.2c0.6-0.1,1.2-0.2,1.8-0.3c1-0.2,2.1-0.5,3-0.7c2-0.6,3.8-1.2,5.5-2c8.3-3.8,12-9.7,13.5-14.6
+          c0.7-2.3,1.1-4.7,1.1-7c-1.2,0.7-2.5,1.3-3.9,1.8C259.7,198.7,258.2,199.2,256.7,199.6z"/>
+      </g>
+      <g>
+        <ellipse cx="190.5" cy="143.2" rx="16.2" ry="18.1"/>
+        <path d="M278,173.3c-0.6-4.5-2.9-8.5-6.1-11.6c-0.9-0.9-2-1.8-3.1-2.5c-1-0.7-2.1-1.4-3.2-1.9c-2.1-1-4.3-1.8-6.7-2.3
+          c-3.7-0.8-7.7-1-11.8-0.4c-5.3,0.8-10,2.7-13.9,5.5c-4.1-0.5-9.1-0.9-14.7-0.7c1.6-4.6,2.3-9.7,1.8-15c-0.4-4.4-1.6-8.7-3.5-12.5
+          c-1.9-3.8-4.5-7.3-7.7-10.2c-5.8-5.2-12.9-7.9-20.3-7.9c0-2.8-0.5-5.3-1.2-7.5c-2.3-6.5-7.3-10.9-11.9-14
+          c-0.5-0.3-0.9-0.6-1.4-0.9c-0.5-0.3-1-0.6-1.6-0.9c-1-0.5-2.1-1-3.3-1.4c-6.4-2.4-14.9-3.8-19.2-3.5c2.3-4.2,4.1-8.7,5.5-13.2
+          c2.2-7.6-1.9-15.5-9.2-17.9c-3.5-1.1-7.2-0.8-10.4,1c-3.4,1.8-5.8,4.9-6.9,8.6c-0.5,1.6-1.1,3.3-1.8,4.9c-0.5-2.1-1.2-4.2-2.1-6.2
+          c-1.8-3.9-4.2-7.4-7.2-10.2s-6.5-5.1-10.4-6.7c-7.8-3.1-16.3-3-23.8,0.4c-15.5,7-22.1,25.9-14.7,42c0.2,0.5,0.5,1,0.8,1.5
+          c-0.4,0.1-0.8,0.2-1.3,0.3C65,91,62.1,93.5,60.4,97c-3.5,7-0.8,15.6,5.9,19.3c1.1,0.6,2.3,1.2,3.4,1.7c-0.8,5.6-4.4,26.2-16,36.5
+          C40.1,166.5,21,194.2,34.5,213c6.1,8.5,13.8,12.7,21.6,13.4c1.2,0.1,2.3,0.1,3.5,0.1c0.6,0,1.2-0.1,1.8-0.2
+          c0.3,0.8,0.6,1.7,0.9,2.5c0.4,1.1,0.9,2.2,1.5,3.4c4.9,10,15.1,22.7,36.5,35.6c12.3,7.4,25,10.3,36.9,10.3
+          c19.9,0,37.7-6.3,47.7-14.7c7.5-6.2,10.8-12.5,9-17.2c-3.4-9,1-20.9,3-24.7c7.8,3,17.9,5.6,29.9,5.6c3.1,0,6.3-0.2,9.6-0.5
+          c0.7-0.1,1.4-0.2,2.1-0.3c0.5-0.1,0.9-0.1,1.4-0.2c0.3-0.1,0.6-0.1,1-0.2c1.7-0.3,3.3-0.6,4.8-1.1c15.7-4.2,21.1-14.1,23-20
+          c1.3-4,1.6-8.1,1.2-12C275.9,187.7,279.1,180.6,278,173.3z M189,118.8c6,0,11.8,2.3,16.6,6.6c5.4,4.9,8.8,11.8,9.5,19.4
+          c0.1,1,0.2,2,0.2,3c0,0.8,0,1.6-0.1,2.4c0,0.2,0,0.5-0.1,0.7c-0.1,0.6-0.1,1.1-0.2,1.7c0,0.2-0.1,0.5-0.1,0.7
+          c-0.1,0.7-0.3,1.4-0.5,2.1c-0.1,0.2-0.1,0.5-0.2,0.7c-0.1,0.5-0.3,1-0.4,1.4c-0.1,0.3-0.2,0.6-0.3,1c-0.1,0.4-0.3,0.7-0.4,1.1
+          c0,0,0,0,0,0c-10.7,1.1-23.1,4.5-35.8,12.1c-0.2-0.2-0.5-0.3-0.7-0.5c-0.1-0.1-0.3-0.2-0.4-0.3c-0.5-0.4-1.1-0.8-1.6-1.2
+          c-0.1-0.1-0.2-0.1-0.2-0.2c-0.6-0.5-1.2-1.1-1.8-1.6c0,0,0,0,0,0c-0.5-0.5-1-1.1-1.5-1.7c-0.1-0.2-0.3-0.3-0.4-0.5
+          c-0.4-0.4-0.7-0.9-1-1.3c-0.2-0.2-0.3-0.4-0.4-0.6c-0.3-0.5-0.6-0.9-0.9-1.4c-0.1-0.2-0.3-0.4-0.4-0.6c-0.4-0.7-0.8-1.4-1.1-2.1
+          c-1.4-3.1-2.4-6.5-2.7-10.1c-0.7-7.6,1.3-15,5.7-20.8c0.6-0.8,1.3-1.6,2-2.3c4.1-4.4,9.5-7.1,15.3-7.6
+          C187.5,118.8,188.3,118.8,189,118.8z M85.9,50.5c3.3-1.5,6.8-2.2,10.3-2.2c3.2,0,6.5,0.6,9.6,1.9c6.6,2.6,11.9,7.8,14.9,14.4
+          c0.5,1,0.8,2,1.2,3c-9.3,0.1-32.9,2.4-46.4,21.7c-0.7-1.1-1.3-2.2-1.8-3.4C67.4,72.4,73,56.4,85.9,50.5z M68.6,111.9
+          c-4.4-2.4-6.1-8.1-3.8-12.7c1.1-2.3,3-3.9,5.3-4.6c0.8-0.3,1.7-0.4,2.6-0.4c1.4,0,2.8,0.4,4,1c9,4.9,19.7,5,30.2,0.4
+          c12.8-5.6,23.2-17.3,27-30.4c0.7-2.5,2.3-4.5,4.5-5.6c2-1.1,4.4-1.3,6.6-0.6c4.7,1.5,7.4,6.7,5.9,11.7
+          c-5.3,18.3-19.5,34.5-37.1,42.2c-7.3,3.2-14.7,4.8-22.1,4.8C83.6,117.8,75.8,115.8,68.6,111.9z M263.9,203.3
+          c-1.5,4.9-5.2,10.8-13.5,14.6c-1.6,0.7-3.4,1.4-5.5,2c-1,0.3-2,0.5-3,0.7c-0.6,0.1-1.2,0.2-1.8,0.3c-0.3,0-0.6,0.1-0.9,0.2
+          c-28.7,4.4-48.8-7.6-54.9-11.9c3.9-4.5,5-7.1,5.2-12.1c0.1-1.4-1.1-2.6-2.4-2.6c-1.4-0.1-2.6,1.1-2.6,2.4c-0.2,4.9-1,9.4-6.8,13
+          c-0.6,0.4-1.2,0.6-1.7,0.9c-2.5,1-4.8,1.1-7.1,0c-1.3-0.6-2.8-0.1-3.4,1.2c-0.6,1.3-0.1,2.8,1.2,3.4c1.8,0.9,3.7,1.3,5.6,1.3
+          c1.7,0,3.4-0.4,5.1-1c1-0.4,1.9-0.8,2.9-1.4c0.7-0.4,1.4-0.9,2-1.4c1.8,1.4,4.2,4.1,10.1,6.8c-2,3.9-5.5,13.5-4.4,22.7
+          c0.2,1.9,0.6,3.8,1.3,5.6c0.2,0.6,0.2,1.4-0.1,2.3c-0.7,2.3-3,5.7-7.4,9.4c-11.7,9.7-34.7,17.9-58.8,12.2
+          c-0.1-0.3-0.2-0.6-0.3-0.9c-1-1.7-1.1-3.9-0.6-6.2c0.9-4.5,3.8-9.4,5.3-11.5c0.8-1.1,0.6-2.7-0.6-3.5c-1.1-0.8-2.7-0.6-3.5,0.6
+          c-0.7,0.9-4.4,6.3-5.9,12.4c-0.6,2.5-0.9,5-0.4,7.4c-4.1-1.4-8.1-3.2-12.1-5.4c-1.1-4.4-0.5-7.3,0.6-9.1c1-1.7,2.3-2.4,2.6-2.6
+          c1.3-0.6,1.8-2.1,1.3-3.3c-0.6-1.3-2.1-1.9-3.4-1.3c-1.4,0.6-3.2,2-4.5,4.2c-1.3,2.1-2.3,5-2.1,8.7c-21.4-13.8-29.6-27-32.8-36
+          c3.4-1.1,6.6-3,9.5-5.5c1.9-1.6,3.7-3.6,5.2-5.8c0.6-0.9,1.2-1.9,1.7-3.1c1.6-3.5,2.9-8.2,3.9-13.6c2.2-12.2,3.1-28.2,3.1-42.6
+          c0-1.8,0-3.5,0-5.2c0-1.6,0-3.2-0.1-4.8c-0.2-9.6-0.8-17.6-1.6-22c1.2,0.1,2.4,0.1,3.6,0.1c8.1,0,16.2-1.8,24.1-5.3
+          c12.6-5.6,23.6-15.2,31.3-26.8c2.2,1.1,9.2,4.7,17,9c1,0.6,2.1,1.1,3.1,1.7c1,0.6,2,1.1,3,1.7c5.1,2.9,10.1,6,14,8.7
+          c1,0.7,1.9,1.4,2.7,2c-0.2,0-0.4,0-0.6,0c-1.5,0.1-2.9,0.4-4.3,0.8c-6.5,1.6-12.3,5.5-16.6,11.2c-5.1,6.8-7.5,15.5-6.7,24.4
+          c0.8,7.8,4,14.8,8.7,20.1c1.5,1.7,3.2,3.2,5,4.5c-2.1,1.5-4.2,3.1-6.3,4.8c-0.5,0.4-0.8,0.6-0.8,0.6c-0.1,0.1-0.2,0.2-0.3,0.3
+          c-0.5,0.4-1,0.9-1.6,1.3c-1.1,1-1.3,2.7-0.3,3.9c0.5,0.7,1.2,1,2,1c0.6,0,1.2-0.2,1.6-0.6c5.4-4.8,10.9-8.5,16.3-11.4
+          c9.2-5,18.2-7.7,26.3-9c5.3-0.8,10.2-1,14.6-0.9c0.1,0,0.1,0,0.2,0c0.3,0,0.5,0,0.8,0c0.9,0.1,1.8,0.1,2.7,0.2
+          c-3.8,4.7-5.8,10.4-4.9,16.3c1.6,11.3,12.9,19.3,26.3,19.2c1.2,0,2.3-0.1,3.5-0.2c0.4,0,0.8-0.1,1.2-0.1c1-0.1,2-0.3,3-0.6
+          c1.6-0.4,3-0.9,4.5-1.4c1.3-0.5,2.6-1.1,3.9-1.8C265,198.6,264.6,201,263.9,203.3z"/>
+        <path d="M122.4,132.1c-0.2,0-0.4,0-0.7,0c-9.5,0.9-17.6,6.1-23,13.6c-5.1,7.1-7.8,16.2-6.9,25.9c0.7,7,3.1,13.3,6.8,18.5
+          c5,7.2,12.3,12.3,20.6,14c2.1,0.5,4.3,0.7,6.5,0.7c1,0,2-0.1,3-0.2c18.4-1.8,31.8-19.5,29.9-39.5
+          C156.7,145.4,140.5,130.7,122.4,132.1z M128.2,199.6c-4,0.4-7.9-0.2-11.5-1.5c-4.4-1.6-8.3-4.3-11.5-7.8c-4.5-5-7.6-11.7-8.3-19.2
+          c-1.7-17.2,9.7-32.4,25.3-33.9c0.8-0.1,1.7-0.1,2.5-0.1c14.6,0,27.3,12.3,28.8,28.6C155.2,182.9,143.8,198.1,128.2,199.6z"/>
+        <path d="M125,149.8c-9.7,0-17.5,8.8-17.5,19.6c0,10.8,7.8,19.6,17.5,19.6c9.7,0,17.5-8.8,17.5-19.6
+          C142.5,158.5,134.7,149.8,125,149.8z"/>
+      </g>
+    </g>
+    </svg>
+  </div>
   <div>
-    <div class="signin-title">Life HQ</div>
-    <div class="signin-sub">Your personal command centre. Sign in to sync across all devices.</div>
+    <div class="signin-title">This Is Fine</div>
+    <div class="signin-sub">The house is on fire and the to-do list keeps growing. Everything is fine. Sign in to sync across all devices.</div>
   </div>
   <button class="signin-btn" onclick="signIn()">
     <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -301,14 +467,154 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <!-- Header -->
   <div class="header">
     <div class="header-row1">
-      <div class="header-logo" onclick="openSettings()">
-        <i class="ph-duotone ph-squares-four header-logo-icon"></i>
-        <span class="header-title">Life HQ</span>
+      <div class="header-logo">
+        <div class="header-logo-badge">
+          <svg class="header-logo-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 300 300" xml:space="preserve">
+          <style type="text/css">
+            .st0{fill:none;}
+            .st1{fill:#FA7B21;}
+            .st2{fill:#FFFFFF;}
+            .st3{fill:#FBC44A;}
+          </style>
+          <g>
+            <path class="st0" d="M215.3,147.7c0,0.8,0,1.6-0.1,2.4C215.3,149.3,215.3,148.5,215.3,147.7z"/>
+            <path class="st0" d="M168.1,162.4c-0.1-0.2-0.3-0.4-0.4-0.6C167.8,162,167.9,162.2,168.1,162.4z"/>
+            <path class="st0" d="M215.1,150.8c-0.1,0.6-0.1,1.1-0.2,1.7C215,152,215.1,151.4,215.1,150.8z"/>
+            <path class="st0" d="M214.8,153.3c-0.1,0.7-0.3,1.4-0.5,2.1C214.5,154.7,214.7,154,214.8,153.3z"/>
+            <path class="st0" d="M214.1,156.1c-0.1,0.5-0.3,1-0.4,1.4C213.8,157,214,156.6,214.1,156.1z"/>
+            <path class="st0" d="M170.8,166.3c-0.1-0.2-0.3-0.3-0.4-0.5C170.5,166,170.7,166.2,170.8,166.3z"/>
+            <path class="st0" d="M225,164.7c0.9,0.1,1.8,0.1,2.7,0.2C226.8,164.8,225.9,164.7,225,164.7z"/>
+            <path class="st0" d="M169.4,164.5c-0.2-0.2-0.3-0.4-0.4-0.6C169.1,164.1,169.2,164.3,169.4,164.5z"/>
+            <path class="st0" d="M176.4,171.3c-0.1-0.1-0.3-0.2-0.4-0.3C176.1,171.1,176.2,171.2,176.4,171.3z"/>
+            <path class="st0" d="M174.4,169.8c-0.1-0.1-0.2-0.1-0.2-0.2C174.2,169.7,174.3,169.8,174.4,169.8z"/>
+            <path class="st0" d="M213.3,158.5c-0.1,0.4-0.3,0.7-0.4,1.1C213,159.2,213.2,158.9,213.3,158.5z"/>
+            <path class="st0" d="M172.4,168C172.4,168,172.3,168,172.4,168C172.3,168,172.4,168,172.4,168z"/>
+            <path class="st1" d="M174.3,91.2c0.5,0.3,0.9,0.6,1.4,0.9c3-7.2,5.2-15.3,6.6-24.4c3.1-19.5,1.9-38,1.1-46.5
+              c42.2,11.2,44,61.7,44.8,83.7c0.2,5.7,0.3,8.5,0.9,10.3c1.1,3.7,3.8,5.9,7.2,5.7c7.3-0.3,14.8-10.8,19.4-26.4
+              c4.1,8.3,7.1,16.8,8.9,25.4c2.4,11.8,2.7,24.6,1.1,37.3c1.1,0.6,2.2,1.2,3.2,1.9c1.1,0.8,2.1,1.6,3.1,2.5
+              c2.3-14.8,2.2-29.5-0.6-43.2c-2.5-12-7.2-23.8-14-35.2c-0.7-1.2-2.2-1.9-3.6-1.6c-1.4,0.2-2.5,1.3-2.8,2.7
+              c-4.4,22.1-12.9,29.5-15,29.6c-0.1-0.1-0.2-0.3-0.3-0.7c-0.3-1-0.4-4.9-0.6-8.5c-0.9-24.5-3-81.7-55.1-91.4c-1.1-0.2-2.2,0.1-3,0.9
+              c-0.8,0.8-1.2,1.9-1,3c0.1,0.6,5.8,40.8-6.5,71.6c1.2,0.4,2.3,0.9,3.3,1.4C173.3,90.6,173.8,90.9,174.3,91.2z"/>
+            <path class="st1" d="M240,226.1c-0.5,0.1-0.9,0.1-1.4,0.2c-0.7,0.1-1.4,0.2-2.1,0.3c-3.3,0.4-6.5,0.5-9.6,0.5
+              c-12,0-22.1-2.6-29.9-5.6c-2,3.8-6.4,15.7-3,24.7c1.8,4.7-1.5,11-9,17.2c-10,8.3-27.8,14.7-47.7,14.7c-11.9,0-24.6-2.9-36.9-10.3
+              c-21.4-12.9-31.6-25.6-36.5-35.6c-0.6-1.2-1.1-2.3-1.5-3.4c-0.3-0.9-0.7-1.7-0.9-2.5c-0.6,0.1-1.2,0.1-1.8,0.2
+              c-1.2,0.1-2.3,0-3.5-0.1c0,0.5,0,1,0.1,1.5c1.8,24.7,28,41.9,39.3,48.1c13.8,7.7,29.7,11.5,46.2,11.5c13.3,0,27.1-2.5,40.5-7.6
+              c13.2-5,25.9-12.5,38.6-22.8c9.4-7.6,15.7-17.5,21.7-27c1.1-1.7,2.2-3.5,3.4-5.2c-1.5,0.4-3.1,0.8-4.8,1.1
+              C240.6,226,240.3,226.1,240,226.1z M216.3,251.8C216.3,251.8,216.3,251.8,216.3,251.8c0,0,0-0.1,0-0.1c0.1-0.1,0.2-0.2,0.4-0.2
+              C216.6,251.5,216.5,251.6,216.3,251.8z"/>
+            <path class="st1" d="M258.3,126.5c-0.5-2.5-3.7-3.5-5.5-1.7c-13.7,13.3-33.8,17.9-34.6-2.7c-0.7-18.9-3.3-57.7-14.2-69.1
+              c-2.6-2.7-7.2-0.6-7,3.1c0.5,10.6,0,32.4-9.4,50c0.8,2.3,1.2,4.7,1.2,7.5c7.4-0.1,14.5,2.6,20.3,7.9c3.2,2.9,5.8,6.3,7.7,10.2
+              c1.9,3.8,3.1,8.1,3.5,12.5c0.5,5.3-0.2,10.4-1.8,15c5.6-0.2,10.6,0.1,14.7,0.7c3.9-2.7,8.7-4.7,13.9-5.5c4.1-0.6,8.1-0.4,11.8,0.4
+              C260,145,260.1,135.3,258.3,126.5z"/>
+            <path class="st1" d="M114.2,221.4c4.7-4.7,6.4-11.3,5.1-17.3c-8.3-1.8-15.6-6.9-20.6-14c-3.8,0.6-7.5,2.3-10.5,5.3
+              c-0.6,0.6-1.1,1.1-1.5,1.7c-1,5.5-2.3,10.2-3.9,13.6c0.5,4,2.2,7.8,5.2,10.8C95.2,228.8,106.9,228.7,114.2,221.4z"/>
+            <path class="st1" d="M75.5,89.3c13.4-19.4,37.1-21.6,46.4-21.7c-0.3-1-0.7-2-1.2-3c-3-6.6-8.3-11.7-14.9-14.4
+              c-3.1-1.3-6.4-1.9-9.6-1.9c-3.5,0-7,0.7-10.3,2.2C73,56.4,67.4,72.4,73.7,86C74.2,87.2,74.8,88.3,75.5,89.3z"/>
+            <path class="st1" d="M113.8,112.9c17.6-7.7,31.8-23.9,37.1-42.2c1.5-5-1.2-10.2-5.9-11.7c-2.2-0.7-4.5-0.5-6.6,0.6
+              c-2.2,1.2-3.8,3.2-4.5,5.6c-3.8,13.1-14.1,24.8-27,30.4c-10.5,4.6-21.2,4.5-30.2-0.4c-1.3-0.7-2.7-1-4-1c-0.9,0-1.7,0.1-2.6,0.4
+              c-2.3,0.7-4.2,2.4-5.3,4.6c-2.3,4.6-0.6,10.3,3.8,12.7c7.2,3.9,14.9,5.8,23.1,5.8C99.1,117.8,106.5,116.1,113.8,112.9z"/>
+            <g>
+              <path class="st2" d="M215.1,144.7c-0.7-7.6-4.1-14.5-9.5-19.4c-4.8-4.3-10.6-6.6-16.6-6.6c-0.7,0-1.5,0-2.3,0.1
+                c-5.8,0.6-11.2,3.2-15.3,7.6c-0.7,0.7-1.4,1.5-2,2.3c-4.4,5.8-6.4,13.2-5.7,20.8c0.3,3.6,1.3,7,2.7,10.1c0.3,0.7,0.7,1.4,1.1,2.1
+                c0.1,0.2,0.2,0.4,0.4,0.6c0.3,0.5,0.6,0.9,0.9,1.4c0.1,0.2,0.3,0.4,0.4,0.6c0.3,0.5,0.7,0.9,1,1.3c0.1,0.2,0.3,0.3,0.4,0.5
+                c0.5,0.6,1,1.1,1.5,1.7c0,0,0,0,0,0c0.6,0.6,1.2,1.1,1.8,1.6c0.1,0.1,0.2,0.1,0.2,0.2c0.5,0.4,1.1,0.8,1.6,1.2
+                c0.1,0.1,0.3,0.2,0.4,0.3c0.2,0.2,0.5,0.3,0.7,0.5c12.7-7.7,25.1-11,35.8-12.1c0,0,0,0,0,0c0.2-0.4,0.3-0.7,0.4-1.1
+                c0.1-0.3,0.2-0.6,0.3-1c0.2-0.5,0.3-1,0.4-1.4c0.1-0.2,0.1-0.5,0.2-0.7c0.2-0.7,0.3-1.4,0.5-2.1c0-0.2,0.1-0.5,0.1-0.7
+                c0.1-0.6,0.2-1.1,0.2-1.7c0-0.2,0.1-0.5,0.1-0.7c0.1-0.8,0.1-1.6,0.1-2.4C215.3,146.7,215.2,145.7,215.1,144.7z M190.5,161.2
+                c-8.9,0-16.2-8.1-16.2-18.1s7.2-18.1,16.2-18.1c8.9,0,16.2,8.1,16.2,18.1S199.4,161.2,190.5,161.2z"/>
+              <path class="st2" d="M124.7,137.1c-0.8,0-1.7,0-2.5,0.1c-15.6,1.5-27,16.7-25.3,33.9c0.7,7.5,3.8,14.2,8.3,19.2
+                c3.2,3.5,7.2,6.3,11.5,7.8c3.6,1.3,7.5,1.9,11.5,1.5c15.6-1.5,27-16.7,25.3-34C152,149.4,139.3,137.1,124.7,137.1z M125,188.9
+                c-9.7,0-17.5-8.8-17.5-19.6c0-10.8,7.8-19.6,17.5-19.6c9.7,0,17.5,8.8,17.5,19.6C142.5,180.1,134.7,188.9,125,188.9z"/>
+            </g>
+            <g>
+              <path class="st3" d="M216.3,251.8C216.3,251.8,216.3,251.8,216.3,251.8c0.1-0.1,0.3-0.2,0.4-0.4c-0.1,0.1-0.2,0.2-0.4,0.2
+                C216.3,251.7,216.3,251.7,216.3,251.8z"/>
+              <path class="st3" d="M264.5,119.8c-1.8-8.6-4.8-17.1-8.9-25.4c-4.6,15.6-12.1,26.1-19.4,26.4c-3.4,0.2-6.1-2-7.2-5.7
+                c-0.5-1.8-0.7-4.6-0.9-10.3c-0.8-22-2.6-72.5-44.8-83.7c0.9,8.6,2.1,27-1.1,46.5c-1.5,9.1-3.7,17.2-6.6,24.4
+                c4.6,3.2,9.6,7.6,11.9,14c9.4-17.6,9.9-39.5,9.4-50c-0.2-3.7,4.4-5.8,7-3.1c10.9,11.4,13.6,50.1,14.2,69.1
+                c0.7,20.6,20.9,16,34.6,2.7c1.9-1.8,5-0.9,5.5,1.7c1.8,8.8,1.8,18.5,0.6,28.4c2.4,0.5,4.6,1.3,6.7,2.3
+                C267.2,144.4,266.9,131.7,264.5,119.8z"/>
+              <path class="st3" d="M256.7,199.6c-1,0.2-2,0.4-3,0.6c-0.4,0.1-0.8,0.1-1.2,0.1c-1.2,0.1-2.3,0.2-3.5,0.2
+                c-13.3,0.1-24.6-7.9-26.3-19.2c-0.8-5.9,1.1-11.6,4.9-16.3c-0.9-0.1-1.8-0.2-2.7-0.2c-0.3,0-0.5,0-0.8,0c-0.1,0-0.1,0-0.2,0
+                c-4.4-0.1-9.3,0.1-14.6,0.9c-8.1,1.3-17.1,3.9-26.3,9c-5.4,2.9-10.9,6.7-16.3,11.4c-0.5,0.4-1.1,0.6-1.6,0.6c-0.7,0-1.5-0.3-2-1
+                c-0.9-1.2-0.8-2.9,0.3-3.9c0.5-0.5,1-0.9,1.6-1.3c0.1-0.1,0.2-0.2,0.3-0.3c0,0,0.3-0.3,0.8-0.6c2.1-1.7,4.2-3.3,6.3-4.8
+                c-1.8-1.3-3.5-2.8-5-4.5c-4.7-5.3-7.9-12.3-8.7-20.1c-0.8-8.9,1.5-17.5,6.7-24.4c4.3-5.7,10.1-9.5,16.6-11.2
+                c1.4-0.4,2.8-0.6,4.3-0.8c0.2,0,0.4,0,0.6,0c-0.8-0.6-1.7-1.3-2.7-2c-3.9-2.7-8.9-5.8-14-8.7c-1-0.6-2-1.1-3-1.7
+                c-1.1-0.6-2.1-1.2-3.1-1.7c-7.8-4.3-14.9-7.9-17-9c-7.6,11.6-18.6,21.3-31.3,26.8c-7.9,3.5-16,5.3-24.1,5.3
+                c-1.2,0-2.4-0.1-3.6-0.1c0.7,4.5,1.3,12.5,1.6,22c0,1.5,0.1,3.1,0.1,4.8c0,1.7,0,3.4,0,5.2c0,14.3-0.9,30.3-3.1,42.6
+                c0.5-0.6,1-1.2,1.5-1.7c3-3,6.7-4.7,10.5-5.3c-3.7-5.2-6.1-11.5-6.8-18.5c-0.9-9.7,1.8-18.8,6.9-25.9c5.4-7.5,13.5-12.7,23-13.6
+                c0.2,0,0.4,0,0.7,0c18.1-1.3,34.3,13.3,36.2,33.1c1.9,20-11.5,37.7-29.9,39.5c-1,0.1-2,0.2-3,0.2c-2.2,0-4.4-0.2-6.5-0.7
+                c1.3,6-0.3,12.6-5.1,17.3c-7.3,7.3-19,7.4-26.2,0.2c-3-3-4.7-6.9-5.2-10.8c-0.5,1.2-1.1,2.2-1.7,3.1c-1.5,2.2-3.3,4.1-5.2,5.8
+                c-2.9,2.5-6.1,4.3-9.5,5.5c3.1,9,11.4,22.3,32.8,36c-0.1-3.7,0.8-6.6,2.1-8.7c1.4-2.2,3.1-3.6,4.5-4.2c1.3-0.6,2.8,0,3.4,1.3
+                c0.6,1.3,0,2.8-1.3,3.3c-0.3,0.1-1.6,0.8-2.6,2.6c-1,1.8-1.7,4.6-0.6,9.1c4,2.3,8.1,4.1,12.1,5.4c-0.5-2.4-0.3-5,0.4-7.4
+                c1.5-6,5.3-11.5,5.9-12.4c0.8-1.1,2.4-1.4,3.5-0.6c1.1,0.8,1.4,2.4,0.6,3.5c-1.5,2.2-4.4,7-5.3,11.5c-0.5,2.3-0.4,4.5,0.6,6.2
+                c0.2,0.3,0.3,0.6,0.3,0.9c24.2,5.8,47.1-2.5,58.8-12.2c4.4-3.7,6.7-7,7.4-9.4c0.3-0.9,0.3-1.7,0.1-2.3c-0.7-1.8-1.1-3.7-1.3-5.6
+                c-1.1-9.2,2.4-18.8,4.4-22.7c-5.9-2.7-8.2-5.5-10.1-6.8c-0.7,0.5-1.4,1-2,1.4c-1,0.6-1.9,1-2.9,1.4c-1.7,0.7-3.4,1-5.1,1
+                c-1.9,0-3.8-0.4-5.6-1.3c-1.3-0.6-1.8-2.1-1.2-3.4c0.6-1.3,2.1-1.8,3.4-1.2c2.2,1.1,4.6,1,7.1,0c0.6-0.2,1.1-0.5,1.7-0.9
+                c5.8-3.5,6.7-8,6.8-13c0.1-1.4,1.3-2.5,2.6-2.4c1.4,0.1,2.5,1.2,2.4,2.6c-0.2,5-1.3,7.6-5.2,12.1c6.1,4.3,26.2,16.3,54.9,11.9
+                c0.3,0,0.6-0.1,0.9-0.2c0.6-0.1,1.2-0.2,1.8-0.3c1-0.2,2.1-0.5,3-0.7c2-0.6,3.8-1.2,5.5-2c8.3-3.8,12-9.7,13.5-14.6
+                c0.7-2.3,1.1-4.7,1.1-7c-1.2,0.7-2.5,1.3-3.9,1.8C259.7,198.7,258.2,199.2,256.7,199.6z"/>
+            </g>
+            <g>
+              <ellipse cx="190.5" cy="143.2" rx="16.2" ry="18.1"/>
+              <path d="M278,173.3c-0.6-4.5-2.9-8.5-6.1-11.6c-0.9-0.9-2-1.8-3.1-2.5c-1-0.7-2.1-1.4-3.2-1.9c-2.1-1-4.3-1.8-6.7-2.3
+                c-3.7-0.8-7.7-1-11.8-0.4c-5.3,0.8-10,2.7-13.9,5.5c-4.1-0.5-9.1-0.9-14.7-0.7c1.6-4.6,2.3-9.7,1.8-15c-0.4-4.4-1.6-8.7-3.5-12.5
+                c-1.9-3.8-4.5-7.3-7.7-10.2c-5.8-5.2-12.9-7.9-20.3-7.9c0-2.8-0.5-5.3-1.2-7.5c-2.3-6.5-7.3-10.9-11.9-14
+                c-0.5-0.3-0.9-0.6-1.4-0.9c-0.5-0.3-1-0.6-1.6-0.9c-1-0.5-2.1-1-3.3-1.4c-6.4-2.4-14.9-3.8-19.2-3.5c2.3-4.2,4.1-8.7,5.5-13.2
+                c2.2-7.6-1.9-15.5-9.2-17.9c-3.5-1.1-7.2-0.8-10.4,1c-3.4,1.8-5.8,4.9-6.9,8.6c-0.5,1.6-1.1,3.3-1.8,4.9c-0.5-2.1-1.2-4.2-2.1-6.2
+                c-1.8-3.9-4.2-7.4-7.2-10.2s-6.5-5.1-10.4-6.7c-7.8-3.1-16.3-3-23.8,0.4c-15.5,7-22.1,25.9-14.7,42c0.2,0.5,0.5,1,0.8,1.5
+                c-0.4,0.1-0.8,0.2-1.3,0.3C65,91,62.1,93.5,60.4,97c-3.5,7-0.8,15.6,5.9,19.3c1.1,0.6,2.3,1.2,3.4,1.7c-0.8,5.6-4.4,26.2-16,36.5
+                C40.1,166.5,21,194.2,34.5,213c6.1,8.5,13.8,12.7,21.6,13.4c1.2,0.1,2.3,0.1,3.5,0.1c0.6,0,1.2-0.1,1.8-0.2
+                c0.3,0.8,0.6,1.7,0.9,2.5c0.4,1.1,0.9,2.2,1.5,3.4c4.9,10,15.1,22.7,36.5,35.6c12.3,7.4,25,10.3,36.9,10.3
+                c19.9,0,37.7-6.3,47.7-14.7c7.5-6.2,10.8-12.5,9-17.2c-3.4-9,1-20.9,3-24.7c7.8,3,17.9,5.6,29.9,5.6c3.1,0,6.3-0.2,9.6-0.5
+                c0.7-0.1,1.4-0.2,2.1-0.3c0.5-0.1,0.9-0.1,1.4-0.2c0.3-0.1,0.6-0.1,1-0.2c1.7-0.3,3.3-0.6,4.8-1.1c15.7-4.2,21.1-14.1,23-20
+                c1.3-4,1.6-8.1,1.2-12C275.9,187.7,279.1,180.6,278,173.3z M189,118.8c6,0,11.8,2.3,16.6,6.6c5.4,4.9,8.8,11.8,9.5,19.4
+                c0.1,1,0.2,2,0.2,3c0,0.8,0,1.6-0.1,2.4c0,0.2,0,0.5-0.1,0.7c-0.1,0.6-0.1,1.1-0.2,1.7c0,0.2-0.1,0.5-0.1,0.7
+                c-0.1,0.7-0.3,1.4-0.5,2.1c-0.1,0.2-0.1,0.5-0.2,0.7c-0.1,0.5-0.3,1-0.4,1.4c-0.1,0.3-0.2,0.6-0.3,1c-0.1,0.4-0.3,0.7-0.4,1.1
+                c0,0,0,0,0,0c-10.7,1.1-23.1,4.5-35.8,12.1c-0.2-0.2-0.5-0.3-0.7-0.5c-0.1-0.1-0.3-0.2-0.4-0.3c-0.5-0.4-1.1-0.8-1.6-1.2
+                c-0.1-0.1-0.2-0.1-0.2-0.2c-0.6-0.5-1.2-1.1-1.8-1.6c0,0,0,0,0,0c-0.5-0.5-1-1.1-1.5-1.7c-0.1-0.2-0.3-0.3-0.4-0.5
+                c-0.4-0.4-0.7-0.9-1-1.3c-0.2-0.2-0.3-0.4-0.4-0.6c-0.3-0.5-0.6-0.9-0.9-1.4c-0.1-0.2-0.3-0.4-0.4-0.6c-0.4-0.7-0.8-1.4-1.1-2.1
+                c-1.4-3.1-2.4-6.5-2.7-10.1c-0.7-7.6,1.3-15,5.7-20.8c0.6-0.8,1.3-1.6,2-2.3c4.1-4.4,9.5-7.1,15.3-7.6
+                C187.5,118.8,188.3,118.8,189,118.8z M85.9,50.5c3.3-1.5,6.8-2.2,10.3-2.2c3.2,0,6.5,0.6,9.6,1.9c6.6,2.6,11.9,7.8,14.9,14.4
+                c0.5,1,0.8,2,1.2,3c-9.3,0.1-32.9,2.4-46.4,21.7c-0.7-1.1-1.3-2.2-1.8-3.4C67.4,72.4,73,56.4,85.9,50.5z M68.6,111.9
+                c-4.4-2.4-6.1-8.1-3.8-12.7c1.1-2.3,3-3.9,5.3-4.6c0.8-0.3,1.7-0.4,2.6-0.4c1.4,0,2.8,0.4,4,1c9,4.9,19.7,5,30.2,0.4
+                c12.8-5.6,23.2-17.3,27-30.4c0.7-2.5,2.3-4.5,4.5-5.6c2-1.1,4.4-1.3,6.6-0.6c4.7,1.5,7.4,6.7,5.9,11.7
+                c-5.3,18.3-19.5,34.5-37.1,42.2c-7.3,3.2-14.7,4.8-22.1,4.8C83.6,117.8,75.8,115.8,68.6,111.9z M263.9,203.3
+                c-1.5,4.9-5.2,10.8-13.5,14.6c-1.6,0.7-3.4,1.4-5.5,2c-1,0.3-2,0.5-3,0.7c-0.6,0.1-1.2,0.2-1.8,0.3c-0.3,0-0.6,0.1-0.9,0.2
+                c-28.7,4.4-48.8-7.6-54.9-11.9c3.9-4.5,5-7.1,5.2-12.1c0.1-1.4-1.1-2.6-2.4-2.6c-1.4-0.1-2.6,1.1-2.6,2.4c-0.2,4.9-1,9.4-6.8,13
+                c-0.6,0.4-1.2,0.6-1.7,0.9c-2.5,1-4.8,1.1-7.1,0c-1.3-0.6-2.8-0.1-3.4,1.2c-0.6,1.3-0.1,2.8,1.2,3.4c1.8,0.9,3.7,1.3,5.6,1.3
+                c1.7,0,3.4-0.4,5.1-1c1-0.4,1.9-0.8,2.9-1.4c0.7-0.4,1.4-0.9,2-1.4c1.8,1.4,4.2,4.1,10.1,6.8c-2,3.9-5.5,13.5-4.4,22.7
+                c0.2,1.9,0.6,3.8,1.3,5.6c0.2,0.6,0.2,1.4-0.1,2.3c-0.7,2.3-3,5.7-7.4,9.4c-11.7,9.7-34.7,17.9-58.8,12.2
+                c-0.1-0.3-0.2-0.6-0.3-0.9c-1-1.7-1.1-3.9-0.6-6.2c0.9-4.5,3.8-9.4,5.3-11.5c0.8-1.1,0.6-2.7-0.6-3.5c-1.1-0.8-2.7-0.6-3.5,0.6
+                c-0.7,0.9-4.4,6.3-5.9,12.4c-0.6,2.5-0.9,5-0.4,7.4c-4.1-1.4-8.1-3.2-12.1-5.4c-1.1-4.4-0.5-7.3,0.6-9.1c1-1.7,2.3-2.4,2.6-2.6
+                c1.3-0.6,1.8-2.1,1.3-3.3c-0.6-1.3-2.1-1.9-3.4-1.3c-1.4,0.6-3.2,2-4.5,4.2c-1.3,2.1-2.3,5-2.1,8.7c-21.4-13.8-29.6-27-32.8-36
+                c3.4-1.1,6.6-3,9.5-5.5c1.9-1.6,3.7-3.6,5.2-5.8c0.6-0.9,1.2-1.9,1.7-3.1c1.6-3.5,2.9-8.2,3.9-13.6c2.2-12.2,3.1-28.2,3.1-42.6
+                c0-1.8,0-3.5,0-5.2c0-1.6,0-3.2-0.1-4.8c-0.2-9.6-0.8-17.6-1.6-22c1.2,0.1,2.4,0.1,3.6,0.1c8.1,0,16.2-1.8,24.1-5.3
+                c12.6-5.6,23.6-15.2,31.3-26.8c2.2,1.1,9.2,4.7,17,9c1,0.6,2.1,1.1,3.1,1.7c1,0.6,2,1.1,3,1.7c5.1,2.9,10.1,6,14,8.7
+                c1,0.7,1.9,1.4,2.7,2c-0.2,0-0.4,0-0.6,0c-1.5,0.1-2.9,0.4-4.3,0.8c-6.5,1.6-12.3,5.5-16.6,11.2c-5.1,6.8-7.5,15.5-6.7,24.4
+                c0.8,7.8,4,14.8,8.7,20.1c1.5,1.7,3.2,3.2,5,4.5c-2.1,1.5-4.2,3.1-6.3,4.8c-0.5,0.4-0.8,0.6-0.8,0.6c-0.1,0.1-0.2,0.2-0.3,0.3
+                c-0.5,0.4-1,0.9-1.6,1.3c-1.1,1-1.3,2.7-0.3,3.9c0.5,0.7,1.2,1,2,1c0.6,0,1.2-0.2,1.6-0.6c5.4-4.8,10.9-8.5,16.3-11.4
+                c9.2-5,18.2-7.7,26.3-9c5.3-0.8,10.2-1,14.6-0.9c0.1,0,0.1,0,0.2,0c0.3,0,0.5,0,0.8,0c0.9,0.1,1.8,0.1,2.7,0.2
+                c-3.8,4.7-5.8,10.4-4.9,16.3c1.6,11.3,12.9,19.3,26.3,19.2c1.2,0,2.3-0.1,3.5-0.2c0.4,0,0.8-0.1,1.2-0.1c1-0.1,2-0.3,3-0.6
+                c1.6-0.4,3-0.9,4.5-1.4c1.3-0.5,2.6-1.1,3.9-1.8C265,198.6,264.6,201,263.9,203.3z"/>
+              <path d="M122.4,132.1c-0.2,0-0.4,0-0.7,0c-9.5,0.9-17.6,6.1-23,13.6c-5.1,7.1-7.8,16.2-6.9,25.9c0.7,7,3.1,13.3,6.8,18.5
+                c5,7.2,12.3,12.3,20.6,14c2.1,0.5,4.3,0.7,6.5,0.7c1,0,2-0.1,3-0.2c18.4-1.8,31.8-19.5,29.9-39.5
+                C156.7,145.4,140.5,130.7,122.4,132.1z M128.2,199.6c-4,0.4-7.9-0.2-11.5-1.5c-4.4-1.6-8.3-4.3-11.5-7.8c-4.5-5-7.6-11.7-8.3-19.2
+                c-1.7-17.2,9.7-32.4,25.3-33.9c0.8-0.1,1.7-0.1,2.5-0.1c14.6,0,27.3,12.3,28.8,28.6C155.2,182.9,143.8,198.1,128.2,199.6z"/>
+              <path d="M125,149.8c-9.7,0-17.5,8.8-17.5,19.6c0,10.8,7.8,19.6,17.5,19.6c9.7,0,17.5-8.8,17.5-19.6
+                C142.5,158.5,134.7,149.8,125,149.8z"/>
+            </g>
+          </g>
+          </svg>
+        </div>
       </div>
       <div class="header-search">
         <i class="ph-duotone ph-magnifying-glass ph"></i>
         <input type="text" placeholder="Search tasks…" oninput="searchTasks(this.value)" id="search-input"/>
       </div>
+      <button class="header-settings-btn" onclick="openSettings()" title="Settings">
+        <i class="ph-duotone ph-gear-six ph"></i>
+      </button>
     </div>
   </div>
 
@@ -501,6 +807,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- ── Icon Picker Modal (Add/Edit Area) ── -->
+<div class="modal-overlay" id="icon-picker-modal">
+  <div class="modal">
+    <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
+    <div class="modal-header">
+      <div class="modal-title">Choose Icon</div>
+      <button class="modal-close" onclick="closeIconPicker()"><i class="ph-duotone ph-x"></i></button>
+    </div>
+    <div class="modal-body" style="padding-top:12px">
+      <div class="icon-picker-search">
+        <i class="ph-duotone ph-magnifying-glass ph"></i>
+        <input type="text" placeholder="Search icons…" oninput="renderIconPickerGrid(this.value)" id="icon-picker-search-input"/>
+      </div>
+      <div class="icon-picker-grid" id="icon-picker-grid"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeIconPicker()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveIconPicker()">Select</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── Constants ────────────────────────────────────────────────────────────────
 const AREAS_DEFAULT = {
@@ -512,6 +840,34 @@ const AREAS_DEFAULT = {
   biz1:        {icon:'ph-buildings',         label:'GLK'},
   biz2:        {icon:'ph-cards',             label:'Play Years'},
 };
+
+const ICON_PICKER_OPTIONS = [
+  ['ph-house','home house family'],['ph-buildings','office work business building'],['ph-briefcase','work job career'],
+  ['ph-user','personal profile me'],['ph-users-three','family kids parents'],['ph-game-controller','games gaming fun hobby'],
+  ['ph-television-simple','watch tv movies streaming'],['ph-cards','cards games play'],['ph-airplane','travel flight trip vacation'],
+  ['ph-car','car drive vehicle commute'],['ph-currency-dollar','money finance budget savings'],['ph-credit-card','finance credit card bills'],
+  ['ph-chart-line-up','growth investing stocks business'],['ph-bank','bank finance money'],['ph-first-aid','health medical doctor'],
+  ['ph-barbell','fitness gym health workout'],['ph-person-simple-tai-chi','wellness mindfulness yoga'],['ph-apple-logo','food health diet nutrition'],
+  ['ph-cooking-pot','cooking food kitchen'],['ph-shopping-cart','shopping groceries errands'],['ph-graduation-cap','school education learning'],
+  ['ph-books','books reading study'],['ph-laptop','tech computer coding software'],['ph-desktop','tech computer work'],
+  ['ph-device-mobile','phone tech mobile app'],['ph-palette','art creative design'],['ph-music-notes','music audio'],['ph-film-strip','film video movies'],
+  ['ph-camera','photography camera'],['ph-dog','pet dog animal'],['ph-cat','pet cat animal'],['ph-plant','garden plants nature'],
+  ['ph-house-line','home house renovation'],['ph-wrench','repair tools maintenance'],['ph-broom','cleaning chores home'],
+  ['ph-calendar-blank','calendar schedule planning'],['ph-alarm','time reminder deadline'],['ph-pencil-simple','writing notes'],
+  ['ph-chart-bar','data analytics reports'],['ph-rocket','startup launch project rocket'],['ph-toolbox','build tools project'],
+  ['ph-target','goals targets focus'],['ph-puzzle-piece','side project hobby puzzle'],['ph-joystick','gaming hobby retro'],
+  ['ph-person-simple-run','running exercise fitness'],['ph-bicycle','cycling biking exercise'],['ph-soccer-ball','sports soccer'],
+  ['ph-basketball','sports basketball'],['ph-fish','fishing hobby outdoors'],['ph-tent','camping outdoors travel'],
+  ['ph-tree-palm','vacation travel relax'],['ph-confetti','party celebration event'],['ph-gift','gifts shopping event'],
+  ['ph-lightbulb','ideas brainstorm creative'],['ph-package','shipping packages project'],['ph-receipt','invoices receipts finance'],
+  ['ph-scales','legal law'],['ph-note-pencil','notes writing docs'],['ph-lock-key','security passwords'],
+  ['ph-globe','web internet website'],['ph-shield-check','insurance security protection'],['ph-suitcase','travel packing luggage'],
+  ['ph-trophy','achievement goals awards'],['ph-microphone','podcast content creation'],['ph-video-camera','video content youtube'],
+  ['ph-code','coding developer work'],['ph-tooth','dental health'],['ph-pill','health medicine pharmacy'],
+  ['ph-couch','home furniture decor'],['ph-key','keys access home'],['ph-envelope-simple','mail correspondence email'],
+  ['ph-folders','organization admin files'],['ph-calculator','budget accounting math'],['ph-globe-hemisphere-west','world travel global'],
+  ['ph-star','favorites priority'],['ph-fire','urgent priority hot'],['ph-tag','tag label general'],
+];
 
 // ─── Seed data ────────────────────────────────────────────────────────────────
 const SEED_TASKS = [
@@ -677,6 +1033,8 @@ let tokenClient, accessToken=null;
 let saveTimer=null;
 let pendingDeleteAreaKey=null;
 let blockedPickerSelected=[];
+let iconPickerTargetKey=null;
+let iconPickerSelected='';
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 function initTheme(){
@@ -771,12 +1129,34 @@ async function saveToSheet(){
 function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveToSheet,800);}
 
 // ─── Areas ────────────────────────────────────────────────────────────────────
+function allAreaKeys(){
+  return [...Object.keys(AREAS_DEFAULT),...(settings.customAreas||[]).map(a=>a.key)];
+}
+
+function getAreaOrder(){
+  const all=allAreaKeys();
+  const saved=(settings.areaOrder||[]).filter(k=>all.includes(k));
+  const missing=all.filter(k=>!saved.includes(k));
+  return [...saved,...missing];
+}
+
 function getAreas(){
   const hidden=settings.hiddenAreas||[];
   const out={};
-  Object.keys(AREAS_DEFAULT).forEach(k=>{if(!hidden.includes(k))out[k]=AREAS_DEFAULT[k];});
-  (settings.customAreas||[]).forEach(a=>{if(!hidden.includes(a.key))out[a.key]={icon:a.icon||'ph-tag',label:a.label};});
+  getAreaOrder().forEach(k=>{
+    if(hidden.includes(k))return;
+    if(AREAS_DEFAULT[k]){out[k]=AREAS_DEFAULT[k];return;}
+    const ca=(settings.customAreas||[]).find(a=>a.key===k);
+    if(ca)out[k]={icon:ca.icon||'ph-tag',label:ca.label};
+  });
   return out;
+}
+
+function onAreaReorder(keys){
+  settings.areaOrder=keys;
+  scheduleSave();
+  rebuildAreaSelect();
+  renderAll();
 }
 
 function areaLabel(k){
@@ -787,6 +1167,7 @@ function areaLabel(k){
 }
 
 function areaIcon(k){
+  if(settings['icon_'+k])return settings['icon_'+k];
   if(AREAS_DEFAULT[k])return AREAS_DEFAULT[k].icon;
   const ca=(settings.customAreas||[]).find(a=>a.key===k);
   return ca?(ca.icon||'ph-tag'):'ph-tag';
@@ -871,16 +1252,60 @@ function getFiltered(){
 function sortTasks(list){
   return list.slice().sort((a,b)=>{
     if(a.done!==b.done)return a.done?1:-1;
+    if(a.order!=null&&b.order!=null)return a.order-b.order;
     if(a.deadline&&b.deadline)return new Date(a.deadline)-new Date(b.deadline);
     if(a.deadline)return-1;if(b.deadline)return 1;
     return(a.createdAt||0)-(b.createdAt||0);
   });
 }
 
+function onTaskReorder(keys){
+  keys.forEach((id,i)=>{const t=tasks.find(x=>x.id===id);if(t)t.order=i;});
+  scheduleSave();
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function isOverdue(t){if(!t.deadline||t.done)return false;return new Date(t.deadline+'T00:00:00')<new Date(new Date().toDateString());}
 function isDueSoon(t){if(!t.deadline||t.done)return false;const diff=(new Date(t.deadline+'T00:00:00')-new Date())/86400000;return diff>=0&&diff<=7;}
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ─── Drag & drop reorder (areas + tasks) ──────────────────────────────────────
+function initDragReorder(container,rowSelector,onDrop){
+  if(container.dataset.dragBound)return;
+  container.dataset.dragBound='1';
+  container.addEventListener('pointerdown',e=>{
+    const handle=e.target.closest('.drag-handle');
+    if(!handle||!container.contains(handle))return;
+    const row=handle.closest(rowSelector);
+    if(!row)return;
+    e.preventDefault();
+    const parent=row.parentElement;
+    row.classList.add('dragging');
+    try{row.setPointerCapture(e.pointerId);}catch(err){}
+
+    function onMove(ev){
+      const y=ev.clientY;
+      const siblings=Array.from(parent.children).filter(el=>el!==row&&el.matches(rowSelector));
+      let target=null;
+      for(const sib of siblings){
+        const r=sib.getBoundingClientRect();
+        if(y<r.top+r.height/2){target=sib;break;}
+      }
+      if(target)parent.insertBefore(row,target);
+      else parent.appendChild(row);
+    }
+    function onUp(){
+      row.classList.remove('dragging');
+      try{row.releasePointerCapture(e.pointerId);}catch(err){}
+      document.removeEventListener('pointermove',onMove);
+      document.removeEventListener('pointerup',onUp);
+      const keys=Array.from(parent.children).filter(el=>el.matches(rowSelector)).map(el=>el.dataset.key);
+      onDrop(keys);
+    }
+    document.addEventListener('pointermove',onMove);
+    document.addEventListener('pointerup',onUp);
+  });
+}
 
 // ─── Render ───────────────────────────────────────────────────────────────────
 function renderAll(){updateTabCounts();render();}
@@ -916,7 +1341,7 @@ function render(){
 
     anyContent=true;
     html+=`<div class="area-group">
-      <div class="area-group-header"><i class="ph-duotone ${icon} ph"></i>${escHtml(areaName)}</div>
+      <div class="area-group-header"><span class="area-group-icon-chip"><i class="ph-duotone ${icon} ph"></i></span>${escHtml(areaName)}</div>
       <div class="area-group-tasks" id="agroup-${k}">`;
 
     if(areaTasksAll.length){
@@ -933,6 +1358,10 @@ function render(){
 
   el.innerHTML=html;
   allFiltered.forEach(t=>initSwipe(document.getElementById('wrapper-'+t.id),t.id));
+  areaScope.forEach(k=>{
+    const groupEl=document.getElementById('agroup-'+k);
+    if(groupEl)initDragReorder(groupEl,'.task-wrapper',onTaskReorder);
+  });
 }
 
 function renderCard(t){
@@ -944,13 +1373,12 @@ function renderCard(t){
   }
   const blockedHtml=t.blocked?`<div class="task-blocked"><i class="ph-duotone ph-prohibit"></i>${escHtml(t.blocked)}</div>`:'';
   const notesHtml=t.notes?`<div class="task-notes">${escHtml(t.notes)}</div>`:'';
-  return`<div class="task-wrapper" id="wrapper-${t.id}">
+  const simple=!dl&&!blockedHtml&&!notesHtml;
+  return`<div class="task-wrapper" id="wrapper-${t.id}" data-key="${t.id}">
     <div class="swipe-bg swipe-bg-right"><i class="ph-duotone ph-check-circle"></i></div>
     <div class="swipe-bg swipe-bg-left"><i class="ph-duotone ph-trash"></i></div>
-    <div class="task-card ${t.done?'done':''}" id="card-${t.id}">
-      <div class="task-check ${t.done?'checked':''}" onclick="toggleDone('${t.id}')">
-        ${t.done?'<i class="ph-duotone ph-check"></i>':''}
-      </div>
+    <div class="task-card ${t.done?'done':''} ${simple?'simple':''}" id="card-${t.id}">
+      <div class="task-grab drag-handle"><i class="ph-duotone ph-dots-six-vertical"></i></div>
       <div class="task-body">
         <div class="task-title">${escHtml(t.title)}</div>
         ${dl||blockedHtml?`<div class="task-meta">${dl}</div>${blockedHtml}`:''}
@@ -1096,6 +1524,7 @@ function saveTask(){
 function deleteTask(id,skipConfirm=false){
   if(!skipConfirm&&!confirm('Delete this task?'))return;
   tasks=tasks.filter(t=>t.id!==id);scheduleSave();renderAll();
+  showToast('Task deleted');
 }
 
 function toggleDone(id){
@@ -1160,6 +1589,40 @@ function updateBlockedDisplay(titles){
   document.getElementById('blocked-field-chips').innerHTML=titles.map(t=>`<span class="bf-chip">${escHtml(t)}</span>`).join('');
 }
 
+// ─── Icon picker (Add/Edit Area) ──────────────────────────────────────────────
+function openIconPicker(key,currentIcon){
+  iconPickerTargetKey=key;
+  iconPickerSelected=currentIcon||'';
+  document.getElementById('icon-picker-search-input').value='';
+  renderIconPickerGrid('');
+  document.getElementById('icon-picker-modal').classList.add('open');
+}
+
+function renderIconPickerGrid(filter){
+  const f=filter.trim().toLowerCase();
+  const list=f?ICON_PICKER_OPTIONS.filter(([icon,k])=>k.includes(f)):ICON_PICKER_OPTIONS;
+  const grid=document.getElementById('icon-picker-grid');
+  grid.innerHTML=list.length?list.map(([icon])=>
+    `<button type="button" class="icon-picker-opt ${icon===iconPickerSelected?'selected':''}" onclick="selectIconPickerOption('${icon}')"><i class="ph-duotone ${icon}"></i></button>`
+  ).join(''):'<div class="icon-picker-empty">No icons match.</div>';
+}
+
+function selectIconPickerOption(icon){
+  iconPickerSelected=icon;
+  renderIconPickerGrid(document.getElementById('icon-picker-search-input').value);
+}
+
+function saveIconPicker(){
+  if(!iconPickerSelected||!iconPickerTargetKey){closeIconPicker();return;}
+  settings['icon_'+iconPickerTargetKey]=iconPickerSelected;
+  const custom=(settings.customAreas||[]).find(a=>a.key===iconPickerTargetKey);
+  if(custom)custom.icon=iconPickerSelected;
+  closeIconPicker();
+  renderSettingsAreas();
+}
+
+function closeIconPicker(){document.getElementById('icon-picker-modal').classList.remove('open');iconPickerTargetKey=null;}
+
 // ─── Settings ─────────────────────────────────────────────────────────────────
 function openSettings(){
   syncThemePicker(settings.theme||localStorage.getItem('lifehq_theme')||'auto');
@@ -1168,23 +1631,17 @@ function openSettings(){
 }
 
 function renderSettingsAreas(){
-  const defaultRows=Object.keys(AREAS_DEFAULT).map(k=>{
-    if((settings.hiddenAreas||[]).includes(k))return'';
-    return`<div class="settings-area-item">
-      <div class="settings-area-icon"><i class="ph-duotone ${areaIcon(k)}"></i></div>
-      <input class="settings-area-input" id="setting-${k}" value="${escHtml(areaLabel(k))}" placeholder="${AREAS_DEFAULT[k].label}"/>
+  const areas=getAreas();
+  document.getElementById('settings-areas-list').innerHTML=Object.keys(areas).map(k=>{
+    const placeholder=AREAS_DEFAULT[k]?AREAS_DEFAULT[k].label:'Area name';
+    return`<div class="settings-area-item" data-key="${k}">
+      <span class="drag-handle settings-area-drag"><i class="ph-duotone ph-dots-six-vertical"></i></span>
+      <div class="settings-area-icon" onclick="openIconPicker('${k}','${areaIcon(k)}')"><i class="ph-duotone ${areaIcon(k)}"></i></div>
+      <input class="settings-area-input" id="setting-${k}" value="${escHtml(areaLabel(k))}" placeholder="${placeholder}"/>
       <button class="settings-area-del" onclick="promptDeleteArea('${k}')"><i class="ph-duotone ph-trash"></i></button>
     </div>`;
   }).join('');
-  const customRows=(settings.customAreas||[]).map(a=>{
-    if((settings.hiddenAreas||[]).includes(a.key))return'';
-    return`<div class="settings-area-item">
-      <div class="settings-area-icon"><i class="ph-duotone ph-tag"></i></div>
-      <input class="settings-area-input" id="setting-${a.key}" value="${escHtml(a.label)}" placeholder="Area name"/>
-      <button class="settings-area-del" onclick="promptDeleteArea('${a.key}')"><i class="ph-duotone ph-trash"></i></button>
-    </div>`;
-  }).join('');
-  document.getElementById('settings-areas-list').innerHTML=defaultRows+customRows;
+  initDragReorder(document.getElementById('settings-areas-list'),'.settings-area-item',onAreaReorder);
 }
 
 function addNewArea(){
@@ -1193,16 +1650,18 @@ function addNewArea(){
   settings.customAreas.push({key,label:'New Area',icon:'ph-tag'});
   renderSettingsAreas();
   setTimeout(()=>{const el=document.getElementById('setting-'+key);if(el){el.focus();el.select();}},50);
+  openIconPicker(key,'ph-tag');
 }
 
 function saveSettings(){
-  Object.keys(AREAS_DEFAULT).forEach(k=>{
+  allAreaKeys().forEach(k=>{
     const el=document.getElementById('setting-'+k);
-    if(el){const v=el.value.trim();if(v)settings['label_'+k]=v;}
-  });
-  (settings.customAreas||[]).forEach(a=>{
-    const el=document.getElementById('setting-'+a.key);
-    if(el){const v=el.value.trim();if(v)a.label=v;}
+    if(!el)return;
+    const v=el.value.trim();
+    if(!v)return;
+    if(AREAS_DEFAULT[k]){settings['label_'+k]=v;return;}
+    const ca=(settings.customAreas||[]).find(a=>a.key===k);
+    if(ca)ca.label=v;
   });
   scheduleSave();rebuildAreaSelect();closeSettings();renderAll();
   showToast('Settings saved');
@@ -1227,22 +1686,25 @@ function promptDeleteArea(key){
 
 function confirmDeleteArea(){
   if(!pendingDeleteAreaKey)return;
+  const key=pendingDeleteAreaKey;
+  const name=areaLabel(key);
   const target=document.getElementById('migrate-target').value;
-  if(target)tasks=tasks.map(t=>t.area===pendingDeleteAreaKey?{...t,area:target}:t);
+  if(target)tasks=tasks.map(t=>t.area===key?{...t,area:target}:t);
   if(!settings.hiddenAreas)settings.hiddenAreas=[];
-  settings.hiddenAreas.push(pendingDeleteAreaKey);
+  settings.hiddenAreas.push(key);
   pendingDeleteAreaKey=null;
   scheduleSave();closeDeleteAreaModal();rebuildAreaSelect();renderAll();
+  showToast(`"${name}" deleted`);
 }
 
 function closeDeleteAreaModal(){document.getElementById('delete-area-modal').classList.remove('open');pendingDeleteAreaKey=null;}
 
 // ─── Keyboard & overlays ──────────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();closeBlockedPicker();closeSettings();closeDeleteAreaModal();closeAreasSheet();}
+  if(e.key==='Escape'){closeModal();closeBlockedPicker();closeSettings();closeDeleteAreaModal();closeAreasSheet();closeIconPicker();}
   if(e.key==='n'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openAddModal();
 });
-['task-modal','blocked-modal','settings-modal','delete-area-modal','areas-modal'].forEach(id=>{
+['task-modal','blocked-modal','settings-modal','delete-area-modal','areas-modal','icon-picker-modal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)e.target.classList.remove('open');});
 });
 </script>
